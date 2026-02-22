@@ -28,12 +28,24 @@ app.use(session({
 }));
 
 // Database Connection
-const db = mysql.createConnection({
+const dbConnectionOptions = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASS || '',
     database: process.env.DB_NAME || 'IT-portalen'
-});
+};
+
+// If we are given a custom port (like Aiven's 24540), append it
+if (process.env.DB_PORT) {
+    dbConnectionOptions.port = process.env.DB_PORT;
+}
+
+// If we are connecting to a remote database (like Aiven), we generally need SSL
+if (process.env.DB_HOST && process.env.DB_HOST !== 'localhost') {
+    dbConnectionOptions.ssl = { rejectUnauthorized: false };
+}
+
+const db = mysql.createConnection(dbConnectionOptions);
 
 console.log('Kobler til database med host:', process.env.DB_HOST);
 
