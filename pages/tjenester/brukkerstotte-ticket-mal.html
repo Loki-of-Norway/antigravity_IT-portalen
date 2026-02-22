@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Opprett og følg opp dine saker hos IT-avdelingen.">
+  <title>IT-support - IT-portalen</title>
+  <!-- Absolutte stier -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/png" href="/Images/Loki_Brukerstøtte.png">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/index.html" class="logo">
+          <img src="/Images/Loki_Brukerstøtte.png" alt="Loki Brukerstøtte" class="logo-icon">
+          <span class="logo-text">IT-portalen</span>
+        </a>
+        
+                <nav class="nav-desktop">
+          <ul>
+            <li><a href="/index.html">Hjem</a></li>
+            <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+            <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+            <li><a href="/pages/tjenester/index.html">Support</a></li>
+            <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+            <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+            <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+            <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <a href="/pages/konvertering/login.html" class="btn btn-outline">Logg inn</a>
+          <a href="/pages/konvertering/registrer.html" class="btn btn-primary">Registrer</a>
+          <button class="menu-toggle" aria-label="Meny">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mobilmeny -->
+            <nav class="nav-mobile">
+      <ul>
+        <li><a href="/index.html">Hjem</a></li>
+        <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+        <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+        <li><a href="/pages/tjenester/index.html">Support</a></li>
+        <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+        <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+        <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+        <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+        <li><a href="/pages/konvertering/login.html">Logg inn</a></li>
+        <li><a href="/pages/konvertering/registrer.html">Registrer</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/index.html">Hjem</a>
+        <span>/</span>
+        <a href="/pages/tjenester/brukkerstotte-ticket-mal.html">Tjenester</a>
+        <span>/</span>
+        <span>Brukerstøtte</span>
+      </div>
+      <h1>Loggføring av Saker</h1>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="page-content">
+    <div class="container">
+      
+      <!-- Actions Bar -->
+      <div class="actions-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <p>Loggfør nye saker eller følg opp eksisterende.</p>
+        <button id="new-ticket-btn" class="btn btn-primary">
+          <span style="margin-right: 0.5rem;">+</span> Registrer ny sak
+        </button>
+      </div>
+
+      <!-- Tickets List -->
+      <div class="content-card">
+        <div id="tickets-container">
+            <!-- Loading state -->
+            <p style="text-align: center; color: #888;">Laster saker...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Ticket Wizard Modal (Creation) -->
+  <div id="ticket-modal" class="modal-overlay hidden">
+    <div class="modal-content wizard-modal" style="max-width: 800px;"> <!-- Bredere modal -->
+      <button class="close-modal">&times;</button>
+      
+      <div class="wizard-header">
+        <h2>Registrer ny support-sak</h2>
+        <div class="progress-bar">
+          <div class="step active" data-step="1">1</div>
+          <div class="line"></div>
+          <div class="step" data-step="2">2</div>
+          <div class="line"></div>
+          <div class="step" data-step="3">3</div>
+          <div class="line"></div>
+          <div class="step" data-step="4">4</div>
+          <div class="line"></div>
+          <div class="step" data-step="5">5</div>
+          <div class="line"></div>
+          <div class="step" data-step="6">6</div>
+        </div>
+      </div>
+
+      <form id="ticket-form">
+        <!-- Step 1: Basis (Source) -->
+        <div class="wizard-step active" data-step="1">
+          <h3>Basisinformasjon</h3>
+          <div class="form-group">
+            <label for="source_system">Kilde / System</label>
+            <select name="source_system" id="source_system">
+                <option value="IT-portalen">IT-portalen (Direkte)</option>
+                <option value="Servicedesk">Telefon / Skranke</option>
+                <option value="Email">E-post</option>
+                <option value="Jira">Jira / Prosjekt</option>
+                <option value="Other">Annet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="received_via">Mottatt via</label>
+            <select name="received_via" id="received_via">
+                <option value="form" selected>Skjema</option>
+                <option value="phone">Telefon</option>
+                <option value="email">E-post</option>
+                <option value="chat">Chat / Teams</option>
+                <option value="other">Annet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="incident_time">Tidspunkt oppstått</label>
+            <input type="datetime-local" name="incident_time" id="incident_time">
+          </div>
+        </div>
+
+        <!-- Step 2: Bruker (Info) -->
+        <div class="wizard-step" data-step="2">
+          <h3>Brukerinformasjon</h3>
+          <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 1rem;">Hvem har problemet?</p>
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="user_name">Navn på bruker</label>
+                <input type="text" name="user_name" id="user_name" placeholder="F.eks. Kari Nordmann">
+            </div>
+            <div class="form-group">
+                <label for="user_contact">Kontaktinfo (Tlf/Epost)</label>
+                <input type="text" name="user_contact" id="user_contact" placeholder="Tlf eller Epost">
+            </div>
+            <div class="form-group">
+                <label for="user_department">Avdeling</label>
+                <input type="text" name="user_department" id="user_department">
+            </div>
+            <div class="form-group">
+                <label for="user_location">Lokasjon / Kontor</label>
+                <input type="text" name="user_location" id="user_location">
+            </div>
+            <div class="form-group">
+                <label for="pc_name">Maskinnavn / ID</label>
+                <input type="text" name="pc_name" id="pc_name" placeholder="PC-12345">
+            </div>
+            <div class="form-group">
+                <label for="ip_address">IP-adresse (hvis kjent)</label>
+                <input type="text" name="ip_address" id="ip_address">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Oversikt (Category/Priority) -->
+        <div class="wizard-step" data-step="3">
+          <h3>Kategorisering</h3>
+          <div class="form-group">
+             <label>Kategori</label>
+             <div class="category-grid">
+                <label class="category-card"><input type="radio" name="category" value="hardware" required><div class="card-inner"><span class="icon">💻</span><span>Hardware</span></div></label>
+                <label class="category-card"><input type="radio" name="category" value="software"><div class="card-inner"><span class="icon">💾</span><span>Software</span></div></label>
+                <label class="category-card"><input type="radio" name="category" value="access"><div class="card-inner"><span class="icon">🔑</span><span>Tilgang/AD</span></div></label>
+                <label class="category-card"><input type="radio" name="category" value="network"><div class="card-inner"><span class="icon">🌐</span><span>Nettverk</span></div></label>
+                <label class="category-card"><input type="radio" name="category" value="email_teams"><div class="card-inner"><span class="icon">📧</span><span>E-post/Teams</span></div></label>
+                <label class="category-card"><input type="radio" name="category" value="security"><div class="card-inner"><span class="icon">🔒</span><span>Sikkerhet</span></div></label>
+             </div>
+          </div>
+          <div class="form-group">
+            <label for="title">Kort tittel (Beskrivende)</label>
+            <input type="text" name="title" id="title" required placeholder="F.eks. Skjerm flimrer ved oppstart">
+          </div>
+        </div>
+
+        <!-- Step 4: Detaljer (Description) -->
+        <div class="wizard-step" data-step="4">
+          <h3>Problembeskrivelse</h3>
+          <div class="form-group">
+            <label for="description">Beskrivelse (Brukers ord)</label>
+            <textarea name="description" id="description" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="error_message">Feilmeldinger (Eksakt ordlyd)</label>
+            <input type="text" name="error_message" id="error_message">
+          </div>
+          <div class="form-group">
+            <label for="reproduction_steps">Hvordan gjenskapes problemet?</label>
+            <textarea name="reproduction_steps" id="reproduction_steps" rows="2" placeholder="Steg 1... Steg 2..."></textarea>
+          </div>
+        </div>
+
+        <!-- Step 5: Påvirkning (Impact) -->
+        <div class="wizard-step" data-step="5">
+          <h3>Prioritet og Påvirkning</h3>
+          <div class="form-group">
+            <label for="priority">Prioritet</label>
+            <select name="priority" id="priority">
+                <option value="low">Lav - Mindre problem</option>
+                <option value="medium" selected>Medium - Normal drift</option>
+                <option value="high">Høy - Hindrer arbeid</option>
+                <option value="critical">Kritisk - System nede</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="impact">Påvirkning (Omfang)</label>
+            <select name="impact" id="impact">
+                <option value="low">Enkeltbruker (Litt)</option>
+                <option value="medium" selected>Enkeltbruker (Full stopp)</option>
+                <option value="high">Flere brukere / Avdeling</option>
+                <option value="critical">Hele organisasjonen</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="expected_behavior">Forventet resultat vs Faktisk resultat</label>
+            <textarea name="expected_behavior" id="expected_behavior" rows="2" placeholder="Jeg forventet at... men det som skjedde var..."></textarea>
+          </div>
+        </div>
+
+        <!-- Step 6: Review -->
+        <div class="wizard-step" data-step="6">
+          <h3>Se over og registrer</h3>
+          <div class="review-summary">
+            <p><strong>System:</strong> <span id="summary-source">-</span></p>
+            <p><strong>Bruker:</strong> <span id="summary-user">-</span></p>
+            <p><strong>Kategori:</strong> <span id="summary-category">-</span></p>
+            <p><strong>Tittel:</strong> <span id="summary-title">-</span></p>
+            <p><strong>Prioritet:</strong> <span id="summary-prioritet">-</span></p>
+            <hr style="border-color: var(--border-color); margin: 10px 0;">
+            <p><strong>Beskrivelse:</strong></p>
+            <p id="summary-desc" style="font-style: italic;">-</p>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="wizard-actions">
+          <button type="button" id="prev-btn" class="btn btn-outline hidden">Forrige</button>
+          <button type="button" id="next-btn" class="btn btn-primary">Neste</button>
+          <button type="submit" id="submit-btn" class="btn btn-primary hidden">Registrer Sak</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ticket Detail/Work Modal (For Troubleshooting/Closing) -->
+  <div id="work-modal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 900px; height: 90vh; overflow-y: auto; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 id="work-title">Sak #...</h2>
+            <button class="close-work-modal" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" style="display: flex; gap: 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem;">
+            <button class="tab-btn active" data-tab="info">Info</button>
+            <button class="tab-btn" data-tab="log">Feilsøking</button>
+            <button class="tab-btn" data-tab="solution">Løsning</button>
+        </div>
+
+        <div class="tab-content" id="tab-info" style="display: block;">
+            <div id="work-info-content">Laster...</div>
+        </div>
+
+        <div class="tab-content" id="tab-log" style="display: none;">
+            <h3>Logg og Feilsøking</h3>
+            <textarea id="work-log" rows="10" placeholder="09:00 - Mottatt sak...&#10;09:05 - Sjekket logg..." style="width:100%; padding:10px; background:var(--bg-main); color:white; border:1px solid var(--border-color);"></textarea>
+            <button id="save-log-btn" class="btn btn-outline" style="margin-top:10px;">Lagre logg</button>
+        </div>
+
+        <div class="tab-content" id="tab-solution" style="display: none;">
+            <h3>Løsning og Avslutning</h3>
+            <div class="form-group">
+                <label>Løsningstype</label>
+                <select id="work-solution-type">
+                    <option value="">Velg...</option>
+                    <option value="guidance">Veiledning</option>
+                    <option value="device_fix">Fiks på enhet</option>
+                    <option value="system_fix">Systemendring</option>
+                    <option value="workaround">Midlertidig løsning</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Beskrivelse av løsning</label>
+                <textarea id="work-solution-desc" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Root Cause (Årsak)</label>
+                <input type="text" id="work-root-cause">
+            </div>
+            <div class="form-group">
+                <label>Tid brukt</label>
+                <input type="text" id="work-time-spent" placeholder="F.eks. 1t 30m">
+            </div>
+            <div class="form-group">
+                <label>Læring for lærling</label>
+                <textarea id="work-learning" rows="3" placeholder="Hva lærte du?"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="work-status">
+                    <option value="open">Åpen</option>
+                    <option value="in_progress">Under arbeid</option>
+                    <option value="resolved">Løst</option>
+                    <option value="closed">Lukket</option>
+                </select>
+            </div>
+            <button id="close-ticket-btn" class="btn btn-primary" style="width:100%; margin-top:20px;">Oppdater og Lagre</button>
+        </div>
+    </div>
+  </div>
+
+    <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <p>Theodor "Loki" Kvalem © 2026 IT-portalen. Designet for IT-Studenter, IT-Entusiaster og IT-Arbeidere.</p>
+        <a href="/pages/artikler/personvernerklaering.html" style="color: var(--text-muted); font-size: 0.875rem;">Personvernerklæring</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/tickets.js"></script>
+</body>
+</html>

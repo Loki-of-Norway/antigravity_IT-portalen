@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Læringssenter med kurs og artikler for IT-ferdigheter. Fra grunnleggende til avansert.">
+  <title>Læring - IT-portalen</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/png" href="/Images/Loki_Brukerstøtte.png">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/index.html" class="logo">
+          <img src="/Images/Loki_Brukerstøtte.png" alt="Loki Brukerstøtte" class="logo-icon">
+          <span class="logo-text">IT-portalen</span>
+        </a>
+        
+                <nav class="nav-desktop">
+          <ul>
+            <li><a href="/index.html">Hjem</a></li>
+            <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+            <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+            <li><a href="/pages/tjenester/index.html">Support</a></li>
+            <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+            <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+            <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+            <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <a href="/pages/konvertering/login.html" class="btn btn-outline">Logg inn</a>
+          <a href="/pages/konvertering/registrer.html" class="btn btn-primary">Registrer</a>
+          <button class="menu-toggle" aria-label="Meny">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+            <nav class="nav-mobile">
+      <ul>
+        <li><a href="/index.html">Hjem</a></li>
+        <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+        <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+        <li><a href="/pages/tjenester/index.html">Support</a></li>
+        <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+        <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+        <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+        <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+        <li><a href="/pages/konvertering/login.html">Logg inn</a></li>
+        <li><a href="/pages/konvertering/registrer.html">Registrer</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/index.html">Hjem</a>
+        <span>/</span>
+        <span>Læring</span>
+      </div>
+      <h1>Læringssenter</h1>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="page-content">
+    <div class="container">
+      <div class="content-card">
+        <h2>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          Lær i ditt eget tempo
+        </h2>
+        <p>Våre veiledninger og kurs er designet for å hjelpe deg med å mestre IT-ferdigheter, uansett om du er nybegynner eller ønsker å utvide din eksisterende kunnskap. Alle guider er strukturert steg-for-steg for enkel læring.</p>
+      </div>
+      
+      <p class="section-label">Grunnleggende</p>
+      <div class="cards-grid cards-grid-3 mb-xl">
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <h3>Kom i gang med PC</h3>
+          <p>Grunnleggende introduksjon til datamaskiner, operativsystemer og vanlige programmer.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="btn btn-sm btn-primary" onclick="openCourse('pc-basics')">Start kurs</button>
+            <button class="btn btn-sm btn-outline" onclick="openCourse('pc-basics')">Start Quiz</button>
+          </span>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <h3>E-post og kommunikasjon</h3>
+          <p>Lær å sette opp og bruke e-post effektivt, samt andre kommunikasjonsverktøy.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <h3>Internett og nettlesere</h3>
+          <p>Sikker bruk av internett, nettlesere, og hvordan du finner pålitelig informasjon.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+      </div>
+      
+      <p class="section-label">Videregående</p>
+      <div class="cards-grid cards-grid-3 mb-xl">
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <h3>Office-pakken</h3>
+          <p>Mestre Word, Excel, PowerPoint og andre kontorprogrammer for produktivitet.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+          </div>
+          <h3>Filhåndtering og backup</h3>
+          <p>Organisering av filer, mapper, skylagring og sikkerhetskopier.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3>Grunnleggende sikkerhet</h3>
+          <p>Passordhåndtering, tofaktorautentisering og beskyttelse mot trusler.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+      </div>
+      
+      <p class="section-label">Avansert</p>
+      <div class="cards-grid cards-grid-3">
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+              <line x1="6" y1="6" x2="6.01" y2="6"/>
+              <line x1="6" y1="18" x2="6.01" y2="18"/>
+            </svg>
+          </div>
+          <h3>Nettverkskonfigurasjon</h3>
+          <p>Sett opp og feilsøk hjemmenettverk, rutere og trådløse tilkoblinger.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+            </svg>
+          </div>
+          <h3>Introduksjon til koding</h3>
+          <p>Grunnleggende programmering med HTML, CSS og JavaScript.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+          </div>
+          <h3>Databaser for nybegynnere</h3>
+          <p>Forstå hvordan data lagres og administreres i moderne systemer.</p>
+          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Start kurs</span>
+            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
+          </span>
+        </div>
+      </div>
+      
+      <div class="info-box mt-xl">
+        <p><strong>Tips:</strong> Alle kurs har praktiske øvelser som du kan gjøre i ditt eget tempo. Start med grunnleggende nivå og jobb deg oppover!</p>
+      </div>
+
+      <!-- Fagartikler Section -->
+      <p class="section-label mt-xl">Fagartikler</p>
+      <div class="cards-grid cards-grid-3 mb-xl">
+        <!-- IT-Sikkerhet -->
+        <a href="/pages/artikler/sikkerhet-personvern.html" class="card">
+          <div class="card-icon">🔒</div>
+          <h3>IT-Sikkerhet</h3>
+          <p>Sikkerhet, personvern og CIA-triaden.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Feilsøking -->
+        <a href="/pages/artikler/feilsoking.html" class="card">
+          <div class="card-icon">🔧</div>
+          <h3>Systematisk feilsøking</h3>
+          <p>Lær metoder for å identifisere og løse IT-problemer.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Kommunikasjon -->
+        <a href="/pages/artikler/kommunikasjon.html" class="card">
+          <div class="card-icon">💬</div>
+          <h3>Kommunikasjon i support</h3>
+          <p>Hvordan kommunisere effektivt med brukere.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Konflikthandtering -->
+        <a href="/pages/artikler/konflikthandtering.html" class="card">
+          <div class="card-icon">🤝</div>
+          <h3>Konflikthåndtering</h3>
+          <p>Strategier for å håndtere vanskelige brukere. Fungerer også innad i bedrifter</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Drift & Vedlikehold -->
+        <a href="/pages/artikler/drift-vedlikehold.html" class="card">
+          <div class="card-icon">⚙️</div>
+          <h3>Drift og vedlikehold</h3>
+          <p>Oppdateringer, overvåking og backup.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Etikk & Lovverk -->
+        <a href="/pages/artikler/etikk-lovverk.html" class="card">
+          <div class="card-icon">⚖️</div>
+          <h3>Etikk og lovverk</h3>
+          <p>GDPR, opphavsrett og etiske dilemmaer.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Intelligente systemer -->
+        <a href="/pages/artikler/intelligente-systemer.html" class="card">
+          <div class="card-icon">🤖</div>
+          <h3>AI i brukerstøtte</h3>
+          <p>Hvordan intelligente systemer brukes i support.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Samhandlingsverktøy -->
+        <a href="/pages/artikler/samhandlingsverktoy.html" class="card">
+          <div class="card-icon">👥</div>
+          <h3>Samhandlingsverktøy</h3>
+          <p>Teams, Slack og digital samarbeidskultur.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+        <!-- Kvalitetssikring -->
+        <a href="/pages/artikler/kvalitetssikring.html" class="card">
+          <div class="card-icon">✅</div>
+          <h3>Kvalitetssikring</h3>
+          <p>Dokumentasjon, testing og kontinuerlig forbedring.</p>
+          <span class="card-link">Les artikkel →</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+    <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <p>Theodor "Loki" Kvalem © 2026 IT-portalen. Designet for IT-Studenter, IT-Entusiaster og IT-Arbeidere.</p>
+        <a href="/pages/artikler/personvernerklaering.html" style="color: var(--text-muted); font-size: 0.875rem;">Personvernerklæring</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+
+  <!-- Course Modal Structure -->
+  <div id="courseModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="courseTitle">Kursnavn</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="guide">Veileder</button>
+          <button class="tab-btn" data-tab="quiz">Quiz</button>
+        </div>
+        
+        <div id="guideContent" class="tab-content active">
+          <!-- Guide content injected here -->
+        </div>
+        
+        <div id="quizContent" class="tab-content">
+          <!-- Quiz content injected here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="courseCompleted"> 
+              <strong>Jeg har fullført dette kurset</strong>
+          </label>
+          <div id="quizControls" class="hidden">
+              <span id="quizResultText" style="margin-right:1rem; font-weight:bold;"></span>
+              <button class="btn btn-outline" id="resetQuizBtn">Ta quiz på nytt</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Course Data
+    const courseData = {
+        'pc-basics': {
+            title: 'Kom i gang med PC',
+            content: `
+                <h3>Introduksjon</h3>
+                <p>Velkommen til din nye PC! Dette kurset vil lære deg de absolutte grunnleggende ferdighetene du trenger for å bruke en datamaskin trygt og effektivt. Vi skal se på hvordan du starter maskinen, bruker mus og tastatur, og finner frem til programmene du trenger.</p>
+                
+                <h3>Steg-for-steg veiledning</h3>
+                
+                <h4>1. Slå på PC-en</h4>
+                <ul>
+                    <li><strong>Finn på-knappen (Power):</strong> Den har ofte et symbol som ser ut som en sirkel med en linje gjennom toppen.</li>
+                    <li><strong>Trykk på knappen:</strong> Vent et øyeblikk mens maskinen starter opp.</li>
+                </ul>
+
+                <h4>2. Bruk av musen</h4>
+                <ul>
+                    <li><strong>Bevegelse:</strong> Flytt musen på bordet for å flytte pilen (markøren) på skjermen.</li>
+                    <li><strong>Venstreklikk:</strong> Bruk pekefingeren til å klikke en gang. Dette brukes til å velge ting (ikoner, knapper).</li>
+                    <li><strong>Dobbeltklikk:</strong> Klikk raskt to ganger på venstre knapp. Dette brukes til å åpne programmer eller mapper.</li>
+                    <li><strong>Høyreklikk:</strong> Bruk langfingeren til å klikke én gang på høyre side. Dette gir deg en liten meny med ekstra valgmuligheter.</li>
+                </ul>
+
+                <h4>3. Bruk av tastaturet</h4>
+                <p>Tastaturet ser ut som på en skrivemaskin, men har ekstra knapper.</p>
+                <ul>
+                    <li><strong>Spacebar:</strong> Den lange knappen nederst brukes til å lage mellomrom mellom ord.</li>
+                    <li><strong>Enter:</strong> Den store knappen til høyre brukes ofte til å bekrefte valg eller starte en ny linje.</li>
+                    <li><strong>Backspace (Tilbake):</strong> Pilknappen over Enter sletter tegn til venstre for markøren.</li>
+                </ul>
+
+                <h4>4. Skrivebordet og Start-menyen</h4>
+                <ul>
+                    <li><strong>Skrivebordet:</strong> Dette er hovedskjermen du ser etter oppstart. Her ligger små bilder (ikoner) for programmer eller mapper.</li>
+                    <li><strong>Start-knappen:</strong> Klikk på Windows-logoen nederst til venstre på skjermen. Her åpner du en meny som viser alle programmene på PC-en din.</li>
+                </ul>
+
+                <h4>5. Slå av PC-en</h4>
+                <ul>
+                    <li>Klikk på Start-knappen.</li>
+                    <li>Klikk på strømikonet (ofte nederst til venstre i menyen).</li>
+                    <li>Velg "Slå av" (Shut down). Vent til skjermen blir helt svart før du trykker på den fysiske knappen igjen.</li>
+                </ul>
+            `,
+            quiz: [
+                {
+                    question: "Hva bruker du vanligvis dobbeltklikk med musen til?",
+                    options: [
+                        { text: "Å flytte ikoner rundt på skjermen", correct: false },
+                        { text: "Å åpne programmer eller mapper", correct: true },
+                        { text: "Å slette filer", correct: false }
+                    ]
+                },
+                {
+                    question: "Hva er den første tingen du skal gjøre når du skal bruke en PC som er avslått?",
+                    options: [
+                        { text: "Trykke på Start-knappen på skjermen", correct: false },
+                        { text: "Trykke på Power-knappen (på-knappen) på PC-tårnet/laptopen", correct: true },
+                        { text: "Røre skjermen", correct: false }
+                    ]
+                },
+                {
+                    question: "Hva gjør du hvis du har skrevet feil bokstav i et ord og vil slette den?",
+                    options: [
+                        { text: "Trykker på Enter", correct: false },
+                        { text: "Trykker på Space", correct: false },
+                        { text: "Trykker på Backspace (Tilbake-pilen)", correct: true }
+                    ]
+                },
+                {
+                    question: "Hvor finner du en oversikt over alle programmene som er installert på PC-en?",
+                    options: [
+                        { text: "I papirkurven", correct: false },
+                        { text: "I Start-menyen", correct: true },
+                        { text: "På skrivebordet", correct: false }
+                    ]
+                },
+                {
+                    question: "Hvorfor er det viktig å bruke 'Slå av' i menyen før man drar ut kontakten?",
+                    options: [
+                        { text: "Det er ikke viktig, du kan bare dra ut kontakten", correct: false },
+                        { text: "For å la PC-en lagre filer og lukke programmer riktig før den stopper", correct: true },
+                        { text: "For at PC-en skal bli raskere neste gang du starter den", correct: false }
+                    ]
+                }
+            ]
+        }
+    };
+
+    // Modal & Quiz Logic
+    const modal = document.getElementById('courseModal');
+    const closeBtn = document.querySelector('.close-modal');
+    const tabs = document.querySelectorAll('.tab-btn');
+    const courseCompletedCheckbox = document.getElementById('courseCompleted');
+    let currentCourseSlug = '';
+
+    // Open Modal Function
+    window.openCourse = async function(slug) {
+        if (!courseData[slug]) {
+            alert('Kurset er ikke klart enda.');
+            return;
+        }
+
+        // Check Auth using existing API
+        try {
+            const res = await fetch('/api/user-status');
+            const auth = await res.json();
+            
+            if (!auth.loggedIn) {
+                alert('Du må være logget inn for å ta dette kurset.');
+                window.location.href = '/pages/konvertering/login.html';
+                return;
+            }
+        } catch (e) {
+            console.error('Auth check failed', e);
+            alert('Kunne ikke verifisere brukerstatus. Vennligst logg inn på nytt.');
+            return;
+        }
+
+        currentCourseSlug = slug;
+        const data = courseData[slug];
+
+        document.getElementById('courseTitle').textContent = data.title;
+        document.getElementById('guideContent').innerHTML = data.content;
+        
+        renderQuiz(data.quiz);
+        loadProgress(slug);
+
+        // Reset to first tab
+        switchTab('guide');
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    };
+
+    // Close Modal
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // Tabs
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            switchTab(tab.dataset.tab);
+        });
+    });
+
+    function switchTab(tabName) {
+        // Update buttons
+        tabs.forEach(t => {
+            t.classList.toggle('active', t.dataset.tab === tabName);
+        });
+        
+        // Update content
+        document.querySelectorAll('.tab-content').forEach(c => {
+            c.classList.remove('active');
+        });
+        document.getElementById(tabName + 'Content').classList.add('active');
+    }
+
+    // Render Quiz
+    function renderQuiz(questions) {
+        const container = document.getElementById('quizContent');
+        container.innerHTML = '';
+        
+        document.getElementById('quizControls').classList.add('hidden');
+
+        questions.forEach((q, index) => {
+            const qEl = document.createElement('div');
+            qEl.className = 'quiz-question';
+            
+            const title = document.createElement('h4');
+            title.textContent = `${index + 1}. ${q.question}`;
+            qEl.appendChild(title);
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'quiz-options';
+
+            q.options.forEach((opt, optIndex) => {
+                const optBtn = document.createElement('div');
+                optBtn.className = 'quiz-option';
+                optBtn.textContent = opt.text;
+                optBtn.onclick = () => handleAnswer(optBtn, opt.correct, index, questions.length);
+                optionsDiv.appendChild(optBtn);
+            });
+
+            qEl.appendChild(optionsDiv);
+            
+            const feedback = document.createElement('div');
+            feedback.className = 'quiz-feedback';
+            feedback.id = `feedback-${index}`;
+            qEl.appendChild(feedback);
+
+            container.appendChild(qEl);
+        });
+    }
+
+    let quizScore = 0;
+    let answeredQuestions = new Set();
+
+    function handleAnswer(btn, isCorrect, qIndex, totalQuestions) {
+        const feedbackEl = document.getElementById(`feedback-${qIndex}`);
+        const parent = btn.parentElement;
+
+        // Disable further clicks on this question
+        Array.from(parent.children).forEach(child => {
+            child.style.pointerEvents = 'none';
+            if (child === btn) {
+                if (isCorrect) {
+                    child.classList.add('correct');
+                    feedbackEl.textContent = 'Riktig!';
+                    feedbackEl.style.color = 'green';
+                    if (!answeredQuestions.has(qIndex)) {
+                        quizScore++;
+                    }
+                } else {
+                    child.classList.add('wrong');
+                    feedbackEl.textContent = 'Feil svar.';
+                    feedbackEl.style.color = 'red';
+                }
+            } else {
+                // Determine other answers (optional: show correct answer if wrong?)
+                // For now, simple logic
+            }
+        });
+        
+        answeredQuestions.add(qIndex);
+
+        // Check completion
+        if (answeredQuestions.size === totalQuestions) {
+            finishQuiz(totalQuestions);
+        }
+    }
+
+    function finishQuiz(total) {
+        const controls = document.getElementById('quizControls');
+        const resultText = document.getElementById('quizResultText');
+        
+        controls.classList.remove('hidden');
+        resultText.textContent = `Du fikk ${quizScore} av ${total} riktig!`;
+        
+        // Save result
+        saveQuizResult(currentCourseSlug, quizScore, total);
+    }
+
+    document.getElementById('resetQuizBtn').addEventListener('click', () => {
+        quizScore = 0;
+        answeredQuestions.clear();
+        renderQuiz(courseData[currentCourseSlug].quiz);
+    });
+
+    // API: Load Progress
+    function loadProgress(slug) {
+        fetch(`/api/progress/${slug}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    courseCompletedCheckbox.checked = data.isCompleted;
+                }
+            })
+            .catch(err => console.error('Error loading progress:', err));
+    }
+
+    // API: Save Progress (Checkbox)
+    courseCompletedCheckbox.addEventListener('change', (e) => {
+        const isCompleted = e.target.checked;
+        
+        fetch('/api/progress/course', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseSlug: currentCourseSlug, isCompleted })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.message || 'Kunne ikke lagre fremgang. Er du logget inn?');
+                e.target.checked = !isCompleted; // Revert
+            }
+        });
+    });
+
+    // API: Save Quiz Result
+    function saveQuizResult(slug, score, total) {
+        fetch('/api/progress/quiz', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseSlug: slug, score, totalQuestions: total })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                console.warn('Kunne ikke lagre quiz-resultat:', data.message);
+            }
+        });
+    }
+  </script>
+</body>
+</html>

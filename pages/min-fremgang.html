@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Min Fremgang - IT-portalen</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/progress.css">
+  <link rel="icon" type="image/png" href="/Images/Loki_Brukerstøtte.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Header (Simplified copy of main header) -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/index.html" class="logo">
+          <img src="/Images/Loki_Brukerstøtte.png" alt="Loki Brukerstøtte" class="logo-icon">
+          <span class="logo-text">IT-portalen</span>
+        </a>
+                <nav class="nav-desktop">
+          <ul>
+            <li><a href="/index.html">Hjem</a></li>
+            <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+            <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+            <li><a href="/pages/tjenester/index.html">Support</a></li>
+            <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+            <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+            <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+            <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <section class="page-header">
+    <div class="container">
+      <h1>Min Fremgang</h1>
+      <p>Oversikt over gjennomførte kurs og quiz-resultater</p>
+    </div>
+  </section>
+
+  <main class="page-content">
+    <div class="container">
+        
+        <div id="loginWarning" class="info-box hidden">
+            <p><strong>Obs!</strong> Du må være logget inn for å se din fremgang. <a href="/pages/konvertering/login.html">Logg inn her</a>.</p>
+        </div>
+
+        <div id="dashboardContent">
+            <div class="progress-summary">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsCompleted">0</div>
+                    <div class="stat-label">Fullførte Kurs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsQuizzes">0</div>
+                    <div class="stat-label">Quizer Tatt</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsAvgScore">0%</div>
+                    <div class="stat-label">Snittscore</div>
+                </div>
+            </div>
+
+            <h2>Quiz Resultater over tid</h2>
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+            
+            <h2 class="mt-xl">Detaljert Logg</h2>
+            <div class="content-card">
+                <table style="width:100%; text-align:left; border-collapse:collapse;">
+                    <thead>
+                        <tr style="border-bottom:2px solid var(--border-medium);">
+                            <th style="padding:10px;">Kurs</th>
+                            <th style="padding:10px;">Dato</th>
+                            <th style="padding:10px;">Score</th>
+                            <th style="padding:10px;">Resultat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="progressTableBody">
+                        <!-- Rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </main>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/progress.js"></script>
+</body>
+</html>

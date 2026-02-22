@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Brukerstøtte</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/png" href="../Images/Loki_Brukerstøtte.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="logo">
+          <img src="../Images/Loki_Brukerstøtte.png" alt="Loki Brukerstøtte" class="logo-icon">
+          <span class="logo-text">Admin</span>
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#" class="active" data-view="overview">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Oversikt
+          </a></li>
+          <li><a href="#" data-view="users">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Medlemmer
+          </a></li>
+          <li><a href="#" data-view="feedback">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Vurderinger
+          </a></li>
+          <li><a href="#" data-view="contacts">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15.5a2.5 2.5 0 0 1-2.5 2.5H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Henvendelser
+          </a></li>
+          <li><a href="#" data-view="analytics">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            Analyse
+          </a></li>
+          <li><a href="#" data-view="content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Innhold
+          </a></li>
+        </ul>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn btn-outline" style="width: 100%;">Logg ut</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header">
+        <h1 id="view-title">Oversikt</h1>
+        <div class="admin-user">
+          <span id="admin-name">Laster...</span>
+          <div class="admin-avatar">A</div>
+        </div>
+      </header>
+
+      <div class="admin-content" id="main-view">
+        <!-- Dashboard Overview -->
+        <div id="overview-view" class="view">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Totalt Medlemmer</span>
+              <span class="stat-value" id="stat-users">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Nye Vurderinger</span>
+              <span class="stat-value" id="stat-feedback">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Ubesvarte Meldinger</span>
+              <span class="stat-value" id="stat-contacts">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Aktive Guider</span>
+              <span class="stat-value" id="stat-guides">0</span>
+            </div>
+          </div>
+
+          <div class="charts-row">
+            <div class="content-card">
+              <h3>Brukervekst</h3>
+              <canvas id="usersChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholder for other views -->
+        <div id="users-view" class="view" style="display: none;">
+          <div class="content-card">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Brukernavn</th>
+                  <th>E-post</th>
+                  <th>Rolle</th>
+                  <th>Dato</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="feedback-view" class="view" style="display: none;">
+          <div id="feedback-list" class="feedback-grid"></div>
+        </div>
+
+        <div id="analytics-view" class="view" style="display: none;">
+          <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg);">
+            <div class="content-card">
+              <h3>Brukervekst (uke)</h3>
+              <canvas id="usersChartDetail"></canvas>
+            </div>
+            <div class="content-card">
+              <h3>Topp Chatbot Spørsmål</h3>
+              <canvas id="chatbotChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div id="content-view" class="view" style="display: none;">
+          <div class="tabs" style="display: flex; gap: var(--space-md); margin-bottom: var(--space-lg);">
+            <button class="btn btn-primary" onclick="showContentTab('guides')">Veiledninger</button>
+            <button class="btn btn-outline" onclick="showContentTab('faqs')">FAQ</button>
+          </div>
+          
+          <div id="guides-tab">
+            <div class="content-header" style="display: flex; justify-content: space-between; margin-bottom: var(--space-md);">
+                <h3>Administrer Veiledninger</h3>
+                <button class="btn btn-primary" onclick="openContentModal('guide')">+ Ny Veiledning</button>
+            </div>
+            <div class="content-card">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Tittel</th>
+                    <th>Kategori</th>
+                    <th>Dato</th>
+                    <th>Handlinger</th>
+                  </tr>
+                </thead>
+                <tbody id="guides-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="faqs-tab" style="display: none;">
+            <div class="content-header" style="display: flex; justify-content: space-between; margin-bottom: var(--space-md);">
+                <h3>Administrer FAQ</h3>
+                <button class="btn btn-primary" onclick="openContentModal('faq')">+ Ny FAQ</button>
+            </div>
+            <div class="content-card">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Spørsmål</th>
+                    <th>Kategori</th>
+                    <th>Handlinger</th>
+                  </tr>
+                </thead>
+                <tbody id="faqs-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  </div>
+
+  <!-- Content Modal -->
+  <div id="contentModal" class="modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="content-card" style="width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <h3 id="modalTitle">Nytt Innhold</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeContentModal()">X</button>
+      </div>
+      
+      <form id="contentForm">
+        <input type="hidden" id="contentId">
+        <input type="hidden" id="contentType">
+        
+        <div id="guide-fields">
+          <div class="form-group">
+            <label>Tittel</label>
+            <input type="text" id="guideTitle" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Kategori</label>
+            <select id="guideCategory" class="form-input">
+              <option value="guide">Veiledning</option>
+              <option value="troubleshooting">Feilsøking</option>
+              <option value="security">Sikkerhetstips</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Innhold (Markdown/Tekst)</label>
+            <textarea id="guideContent" class="form-input" rows="8"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Slug (URL-vennlig)</label>
+            <input type="text" id="guideSlug" class="form-input" placeholder="f.eks. hvordan-logge-inn">
+          </div>
+        </div>
+
+        <div id="faq-fields" style="display: none;">
+          <div class="form-group">
+            <label>Spørsmål</label>
+            <input type="text" id="faqQuestion" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Svar</label>
+            <textarea id="faqAnswer" class="form-input" rows="5"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Kategori</label>
+            <input type="text" id="faqCategory" class="form-input">
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-outline" onclick="closeContentModal()">Avbryt</button>
+          <button type="submit" class="btn btn-primary">Lagre</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

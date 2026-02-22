@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nyheter og varslinger fra IT-portalen. Få informasjon om driftsmeldinger og oppdateringer.">
+  <title>IT-portalen - Digital Læring</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/png" href="/Images/Loki_Brukerstøtte.png">
+  <style>
+    .news-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      padding: var(--space-lg);
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-lg);
+    }
+    .news-date {
+      font-size: 0.8125rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+    .news-tag {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      margin-bottom: var(--space-xs);
+    }
+    .tag-maintenance { background-color: #fef3c7; color: #92400e; }
+    .news-tag.tag-update { background-color: #dcfce7; color: #166534; }
+    .news-tag.tag-alert { background-color: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/index.html" class="logo">
+          <img src="/Images/Loki_Brukerstøtte.png" alt="Loki Brukerstøtte" class="logo-icon">
+          <span class="logo-text">IT-portalen</span>
+        </a>
+        
+                <nav class="nav-desktop">
+          <ul>
+            <li><a href="/index.html">Hjem</a></li>
+            <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+            <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+            <li><a href="/pages/tjenester/index.html">Support</a></li>
+            <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+            <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+            <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+            <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <a href="/pages/konvertering/login.html" class="btn btn-outline">Logg inn</a>
+          <a href="/pages/konvertering/registrer.html" class="btn btn-primary">Registrer</a>
+          <button class="menu-toggle" aria-label="Meny">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+            <nav class="nav-mobile">
+      <ul>
+        <li><a href="/index.html">Hjem</a></li>
+        <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+        <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+        <li><a href="/pages/tjenester/index.html">Support</a></li>
+        <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+        <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+        <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+        <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+        <li><a href="/pages/konvertering/login.html">Logg inn</a></li>
+        <li><a href="/pages/konvertering/registrer.html">Registrer</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/index.html">Hjem</a>
+        <span>/</span>
+        <span>Nyheter & Varslinger</span>
+      </div>
+      <h1>Nyheter & Varslinger</h1>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="page-content">
+    <div class="container">
+      <div class="content-card">
+        <h2>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          Siste nytt fra portalen
+        </h2>
+        <p>Her finner du informasjon om planlagt vedlikehold, driftsforstyrrelser og nye funksjoner i brukerstøtteportalen.</p>
+      </div>
+      
+      <p class="section-label">Varslinger</p>
+      
+      <div class="news-item">
+        <div>
+          <span class="news-tag tag-maintenance">Planlagt vedlikehold</span>
+          <span class="news-date">15. januar 2026</span>
+        </div>
+        <h3>Vedlikehold av database</h3>
+        <p>Vi vil gjennomføre planlagt vedlikehold av våre databasesystemer lørdag 20. januar fra kl. 22:00 til 23:00. Portalen kan oppleves som treg i dette tidsrommet.</p>
+      </div>
+      
+      <div class="news-item">
+        <div>
+          <span class="news-tag tag-update">Ny funksjon</span>
+          <span class="news-date">10. januar 2026</span>
+        </div>
+        <h3>Ny chatbot er lansert!</h3>
+        <p>Vi har i dag lansert en forbedret chatbot som kan hjelpe deg med enda flere spørsmål. Prøv den i dag ved å trykke på "Start chat" på forsiden eller i menyen.</p>
+      </div>
+      
+      <div class="news-item">
+        <div>
+          <span class="news-tag tag-alert">Viktig melding</span>
+          <span class="news-date">5. januar 2026</span>
+        </div>
+        <h3>Phishing-forsøk i omløp</h3>
+        <p>Vi har fått rapporter om e-poster som utgir seg for å være fra brukerstøtte og ber om innloggingsdetaljer. Husk at vi aldri vil be deg om passordet ditt via e-post.</p>
+      </div>
+      
+      <div class="news-item">
+        <div>
+          <span class="news-tag tag-update">Oppdatering</span>
+          <span class="news-date">2. januar 2026</span>
+        </div>
+        <h3>Nye veiledninger for Office 365</h3>
+        <p>Vi har lagt til flere nye steg-for-steg guider for bruk av Teams og OneDrive i vår veiledningsseksjon.</p>
+      </div>
+
+      <div class="text-center mt-xl">
+        <button class="btn btn-outline">Last inn flere nyheter</button>
+      </div>
+    </div>
+  </main>
+
+    <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <p>Theodor "Loki" Kvalem © 2026 IT-portalen. Designet for IT-Studenter, IT-Entusiaster og IT-Arbeidere.</p>
+        <a href="/pages/artikler/personvernerklaering.html" style="color: var(--text-muted); font-size: 0.875rem;">Personvernerklæring</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

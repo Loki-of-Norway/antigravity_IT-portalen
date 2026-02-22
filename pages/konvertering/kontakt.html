@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kontakt oss på IT-portalen. Finn vårt kontaktskjema, e-postadresse og telefonnummer.">
+  <title>IT-portalen - Digital Læring</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/png" href="/Images/Loki_Brukerstøtte.png">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/index.html" class="logo">
+          <img src="/Images/Loki_Brukerstøtte.png" alt="Loki Brukerstøtte" class="logo-icon">
+          <span class="logo-text">IT-portalen</span>
+        </a>
+        
+                <nav class="nav-desktop">
+          <ul>
+            <li><a href="/index.html">Hjem</a></li>
+            <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+            <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+            <li><a href="/pages/tjenester/index.html">Support</a></li>
+            <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+            <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+            <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+            <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <a href="/pages/konvertering/login.html" class="btn btn-outline">Logg inn</a>
+          <a href="/pages/konvertering/registrer.html" class="btn btn-primary">Registrer</a>
+          <button class="menu-toggle" aria-label="Meny">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+            <nav class="nav-mobile">
+      <ul>
+        <li><a href="/index.html">Hjem</a></li>
+        <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+        <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+        <li><a href="/pages/tjenester/index.html">Support</a></li>
+        <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+        <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+        <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+        <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+        <li><a href="/pages/konvertering/login.html">Logg inn</a></li>
+        <li><a href="/pages/konvertering/registrer.html">Registrer</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/index.html">Hjem</a>
+        <span>/</span>
+        <span>Kontakt oss</span>
+      </div>
+      <h1>Kontakt oss</h1>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="page-content">
+    <div class="container">
+      <div class="cards-grid cards-grid-feature">
+        <!-- Contact Form -->
+        <div class="content-card">
+          <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15.5a2.5 2.5 0 0 1-2.5 2.5H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Send oss en melding
+          </h2>
+          <form id="contactForm">
+            <div class="form-group">
+              <label for="name" class="form-label">Fullt navn</label>
+              <input type="text" id="name" name="name" class="form-input" placeholder="Ditt navn" required>
+            </div>
+            <div class="form-group">
+              <label for="email" class="form-label">E-postadresse</label>
+              <input type="email" id="email" name="email" class="form-input" placeholder="din@epost.no" required>
+            </div>
+            <div class="form-group">
+              <label for="subject" class="form-label">Emne</label>
+              <select id="subject" name="subject" class="form-select" required>
+                <option value="" disabled selected>Velg emne...</option>
+                <option value="teknisk">Teknisk hjelp</option>
+                <option value="kurs">Spørsmål om kurs</option>
+                <option value="tilbakemelding">Tilbakemelding</option>
+                <option value="annet">Annet</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="message" class="form-label">Melding</label>
+              <textarea id="message" name="message" class="form-textarea" placeholder="Hva kan vi hjelpe deg med?" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Send melding</button>
+          </form>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="contact-info-list" style="display: flex; flex-direction: column; gap: var(--space-lg);">
+          <div class="content-card">
+            <h3>Kontaktinformasjon</h3>
+            <div style="display: flex; flex-direction: column; gap: var(--space-md); margin-top: var(--space-md);">
+              <div style="display: flex; align-items: center; gap: var(--space-md);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span>support@brukerstotte.no</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-md);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <span>55 55 55 55</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: var(--space-md);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Man-fre: 08:00 - 16:00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <h3>Hvor finner du oss?</h3>
+            <p>Vi holder til i IT-avdelingen i 2. etasje.</p>
+            <div style="background-color: var(--bg-hero); height: 200px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-top: var(--space-md);">
+              <span class="text-gray">[Kart over lokasjon]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box mt-xl">
+        <p>Har du generell tilbakemelding om portalen? <a href="/pages/konvertering/tilbakemeldinger.html"><strong>Gi oss tilbakemelding →</strong></a></p>
+      </div>
+    </div>
+  </main>
+
+    <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <p>Theodor "Loki" Kvalem © 2026 IT-portalen. Designet for IT-Studenter, IT-Entusiaster og IT-Arbeidere.</p>
+        <a href="/pages/artikler/personvernerklaering.html" style="color: var(--text-muted); font-size: 0.875rem;">Personvernerklæring</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/forms.js"></script>
+</body>
+</html>

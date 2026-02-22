@@ -1,0 +1,4 @@
+Tables_in_it-portalen (course_progress)
+course_progress
+Tables_in_it-portalen (quiz_results)
+quiz_results
