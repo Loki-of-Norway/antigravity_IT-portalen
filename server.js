@@ -5,12 +5,63 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'MISSING_KEY');
-// Using Gemini 2.5 as confirmed by available models
-const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+// 1. Initialiser Google AI med din hemmelige API-nøkkel fra .env (GEMINI_API_KEY)
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'MISSING_KEY' });
+
+// 2. Kodelærer med Gemini 3.6 Flash
+async function chatMedKodelærer(brukerMelding, chatHistorikk = [], ekstraKontekst = {}) {
+  try {
+    // 2. Start en chat-sesjon med Gemini 3.6 Flash
+    const chat = ai.chats.create({
+      model: 'gemini-3.6-flash',
+      
+      // 3. DETTE ER MAGIEN: Her definerer du rollen som kodelærer
+      config: {
+        systemInstruction: `
+          Du er en tålmodig og pedagogisk kodelærer for nybegynnere. 
+          Ditt mål er ikke å bare gi brukeren det ferdige svaret (kopier/lim inn-kode), 
+          men heller lede dem på rett vei ved å forklare konseptene.
+          - Svar alltid på norsk.
+          - Bruk en oppmuntrende og vennlig tone.
+          - Hvis brukeren har en feil i koden sin, forklar *hvorfor* feilen oppstår, og gi små hint fremfor å skrive om hele koden for dem.
+          - Bruk formatering med kodeblokker (\`\`\`) for å gjøre eksempler enkle å lese.
+          ${ekstraKontekst.taskTitle ? `\nOppgave: ${ekstraKontekst.taskTitle}` : ''}
+          ${ekstraKontekst.taskInstructions ? `\nMål/instruks: ${ekstraKontekst.taskInstructions}` : ''}
+          ${ekstraKontekst.code ? `\nElevens kode nå:\n${ekstraKontekst.code}` : ''}
+          ${ekstraKontekst.errors ? `\nTerminal/konsoll feil:\n${ekstraKontekst.errors}` : ''}
+        `
+      },
+      // Send med tidligere meldinger hvis du vil at den skal huske samtalen
+      history: chatHistorikk 
+    });
+
+    // 4. Send den nye meldingen fra brukeren til boten
+    const result = await chat.sendMessage({ message: brukerMelding });
+    
+    // 5. Returner svaret fra kodelæreren
+    return result.text;
+
+  } catch (error) {
+    console.error("Feil under API-kall (gemini-3.6-flash):", error.message);
+    // Fallback til 2.5-flash dersom 3.6-flash ikke er aktivert på nøkkelen
+    try {
+      const fallbackChat = ai.chats.create({
+        model: 'gemini-2.5-flash',
+        config: {
+          systemInstruction: 'Du er en tålmodig og pedagogisk kodelærer for nybegynnere. Hjelp eleven med hint og forklaringer uten å gi hele fasitsvaret direkte. Svar på norsk.'
+        },
+        history: chatHistorikk
+      });
+      const fallbackResult = await fallbackChat.sendMessage({ message: brukerMelding });
+      return fallbackResult.text;
+    } catch (err2) {
+      console.error("Fallback også feilet:", err2.message);
+      return null;
+    }
+  }
+}
 
 
 const app = express();
@@ -191,109 +242,173 @@ app.post('/api/logout', (req, res) => {
     });
 });
 
-// 5. Chatbot
-// 5. Chatbot (Upgraded with Gemini & Intent Classification)
-app.post('/api/chat', async (req, res) => {
-    const { message, mode } = req.body; // mode: 'decision_tree' (AI classifier) or 'regular' (classic)
-    const userId = req.session.userId || null;
-    
-    // Debug API Key status (Do not log the actual key)
-    console.log(`[Chat Msg] Mode: ${mode}, Has Key: ${!!process.env.GEMINI_API_KEY}`);
+// 5. Chatbot (Upgraded with Gemini 3.6 Flash & Decision Tree)
 
+// AI-Klassifiserer for beslutningstreet via Gemini 3.6 Flash (@google/genai)
+async function classifyDecisionTreeIntent(message) {
+    if (!process.env.GEMINI_API_KEY) return null;
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-3.6-flash',
+            contents: message,
+            config: {
+                systemInstruction: `
+Du er en intelligent klassifiserer for IT-portalen sin support-chatbot.
+Brukeren oppgir et spørsmål, et ønske eller et IT-problem.
+Din oppgave er å kategorisere brukerens henvendelse til ETT av følgende gyldige steg (intents) i vårt beslutningstre:
+
+Gyldige Intents:
+- LEARNING_GRUNNLEGGENDE (PC-oppstart, mus, tastatur, filer, mapper, grunnleggende data, startkurs)
+- LEARNING_OFFICE (Word, Excel, PowerPoint, Teams, Office 365, OneNote)
+- SUPPORT_WIFI (Trådløst nett, Wi-Fi, internett, nettverk, Skole-Guest, Skole-Ansatt)
+- SUPPORT_PRINTER (Printer, utskrift, papirkrøll, toner, installere printer)
+- SUPPORT_HARDWARE (Maskinvare, PC, skjerm, lyd, lader, fysisk skade på utstyr)
+- SUPPORT_PASSWORD (Glemt passord, Feide, nullstille passord, låst konto)
+- TOOLS_REPORT (Melde sak, registrere feil/avvik, sende inn supportsak til IT)
+- TOOLS_GDPR (Personvern, GDPR, sikkerhet, passordregler)
+- CONTACT_INFO (Åpningstider, hvor er IT-avdelingen, telefon, besøksadresse rom 202)
+- UNKNOWN (Dersom meldingen overhodet ikke matcher noen av kategoriene over)
+
+Svar KUN med intent-koden i store bokstaver (f.eks. SUPPORT_WIFI).
+                `,
+                temperature: 0.1
+            }
+        });
+        const text = (response.text || '').trim();
+        const match = text.match(/(LEARNING_GRUNNLEGGENDE|LEARNING_OFFICE|SUPPORT_WIFI|SUPPORT_PRINTER|SUPPORT_HARDWARE|SUPPORT_PASSWORD|TOOLS_REPORT|TOOLS_GDPR|CONTACT_INFO|UNKNOWN)/i);
+        return match ? match[1].toUpperCase() : 'UNKNOWN';
+    } catch (err) {
+        console.error("Feil ved klassifisering med gemini-3.6-flash:", err.message);
+        try {
+            const fallback = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: message,
+                config: {
+                    systemInstruction: 'Klassifiser til ETT av: LEARNING_GRUNNLEGGENDE, LEARNING_OFFICE, SUPPORT_WIFI, SUPPORT_PRINTER, SUPPORT_HARDWARE, SUPPORT_PASSWORD, TOOLS_REPORT, TOOLS_GDPR, CONTACT_INFO, UNKNOWN. Svar kun med intent.'
+                }
+            });
+            const match2 = (fallback.text || '').trim().match(/(LEARNING_GRUNNLEGGENDE|LEARNING_OFFICE|SUPPORT_WIFI|SUPPORT_PRINTER|SUPPORT_HARDWARE|SUPPORT_PASSWORD|TOOLS_REPORT|TOOLS_GDPR|CONTACT_INFO|UNKNOWN)/i);
+            return match2 ? match2[1].toUpperCase() : null;
+        } catch (e2) {
+            return null;
+        }
+    }
+}
+
+// Fri samtale med IT-supportassistent Loki via Gemini 3.6 Flash (@google/genai)
+async function chatMedLokiSupport(userMessage, chatHistory = []) {
+    if (!process.env.GEMINI_API_KEY) return null;
+    try {
+        const chat = ai.chats.create({
+            model: 'gemini-3.6-flash',
+            config: {
+                systemInstruction: `
+Du er "Loki", en vennlig, oppmuntrende og faglig dyktig IT-support assistent for IT-portalen.
+- Svar alltid på flytende, hyggelig norsk.
+- Hjelp elever, lærere og ansatte med IT-problemer (passord, Wi-Fi, printere, programmer, maskinvare).
+- Du kjenner portalens innhold: Vi har kurs for grunnleggende PC, Office/Teams, en interaktiv kodelærings-IDE (HTML/CSS/JS), feilsøkingsguider, FAQ og kontaktskjema.
+- Hold svarene dine konsise, pedagogiske og oversiktlige. Bruk gjerne punktlister eller kodeblokker der det er nyttig.
+- Hvis et problem krever fysisk service eller administrativ hjelp, minn om at de kan melde sak via kontaktskjemaet (/pages/konvertering/kontakt.html) eller besøke IT-kontoret i 2. etasje, rom 202 (åpent 08:00 - 15:30).
+                `
+            },
+            history: chatHistory
+        });
+        const result = await chat.sendMessage({ message: userMessage });
+        return result.text;
+    } catch (err) {
+        console.error("Feil ved Loki support chat med gemini-3.6-flash:", err.message);
+        try {
+            const fallbackChat = ai.chats.create({
+                model: 'gemini-2.5-flash',
+                config: {
+                    systemInstruction: 'Du er Loki, en hjelpsom IT-support assistent for IT-portalen. Svar på norsk, kort og hjelpsomt.'
+                },
+                history: chatHistory
+            });
+            const fallbackResult = await fallbackChat.sendMessage({ message: userMessage });
+            return fallbackResult.text;
+        } catch (e2) {
+            return null;
+        }
+    }
+}
+
+app.post('/api/chat', async (req, res) => {
+    const { message, mode, chatHistory } = req.body; // mode: 'guided' (decision tree) or 'free_chat' (AI assistent)
+    const userId = req.session.userId || null;
 
     if (!message) return res.status(400).json({ success: false, message: 'Melding mangler.' });
 
-    // Default response stuff
     let botResponse = '';
     let intent = 'UNKNOWN';
 
-    // Check if we use AI (Gemini) for classification
-    // Only use if mode is 'decision_tree' AND we have a key (or if user wants AI to always run)
-    // User requested: "Add Gemini 2.5... make it work together with decision tree"
-    
-    if (mode === 'guided' && process.env.GEMINI_API_KEY) {
-        try {
-const systemPrompt = `
-Du er en klassifiserer for IT-portalen sin support-chatbot.
-Din oppgave er å kategorisere brukerens input til ETT av følgende intents for et beslutningstre.
-Du skal også korrigere skrivefeil implisitt.
+    if (mode === 'guided') {
+        // Veiledet modus: Bruk Gemini 3.6 Flash til å hoppe direkte til riktig node i beslutningstreet
+        if (process.env.GEMINI_API_KEY) {
+            const detectedIntent = await classifyDecisionTreeIntent(message);
+            if (detectedIntent && detectedIntent !== 'UNKNOWN') {
+                intent = detectedIntent;
+                botResponse = `[INTENT_DETECTED]: ${intent}`;
+            }
+        }
 
-Gyldige Intents:
-- LEARNING_GRUNNLEGGENDE (PC-start, mus, tastatur)
-- LEARNING_OFFICE (Word, Excel, PowerPoint, Teams)
-- SUPPORT_WIFI (Nettverk, internett, dekning)
-- SUPPORT_PRINTER (Utskrift, papirkrøll, toner)
-- SUPPORT_HARDWARE (Maskinvare, skjerm, lyd)
-- SUPPORT_PASSWORD (Glemt passord, feide, opplåsing)
-- CONTACT_INFO (Åpningstider, telefon, hvor er dere)
-- UNKNOWN
+        // Robust nøkkelord-fallback dersom AI ikke finner match eller API-nøkkel mangler
+        if (intent === 'UNKNOWN') {
+            const lowerInput = message.toLowerCase();
+            if (lowerInput.includes('passord') || lowerInput.includes('feide') || lowerInput.includes('glemt') || lowerInput.includes('nullstill')) {
+                intent = 'SUPPORT_PASSWORD';
+            } else if (lowerInput.includes('wifi') || lowerInput.includes('wi-fi') || lowerInput.includes('nettverk') || lowerInput.includes('internett') || lowerInput.includes('trådløs')) {
+                intent = 'SUPPORT_WIFI';
+            } else if (lowerInput.includes('print') || lowerInput.includes('skriver') || lowerInput.includes('utskrift') || lowerInput.includes('toner') || lowerInput.includes('papir')) {
+                intent = 'SUPPORT_PRINTER';
+            } else if (lowerInput.includes('pc') || lowerInput.includes('skjerm') || lowerInput.includes('mus') || lowerInput.includes('tastatur') || lowerInput.includes('lyd') || lowerInput.includes('maskinvare') || lowerInput.includes('hardware')) {
+                intent = 'SUPPORT_HARDWARE';
+            } else if (lowerInput.includes('word') || lowerInput.includes('excel') || lowerInput.includes('powerpoint') || lowerInput.includes('teams') || lowerInput.includes('office') || lowerInput.includes('onedrive')) {
+                intent = 'LEARNING_OFFICE';
+            } else if (lowerInput.includes('grunnleggende') || lowerInput.includes('kurs') || lowerInput.includes('lære') || lowerInput.includes('start') || lowerInput.includes('nybegynner')) {
+                intent = 'LEARNING_GRUNNLEGGENDE';
+            } else if (lowerInput.includes('kontakt') || lowerInput.includes('åpningstid') || lowerInput.includes('telefon') || lowerInput.includes('hvor') || lowerInput.includes('adresse')) {
+                intent = 'CONTACT_INFO';
+            } else if (lowerInput.includes('sak') || lowerInput.includes('skjema') || lowerInput.includes('melde') || lowerInput.includes('feilmelding') || lowerInput.includes('rapport')) {
+                intent = 'TOOLS_REPORT';
+            } else if (lowerInput.includes('gdpr') || lowerInput.includes('personvern') || lowerInput.includes('sikkerhet')) {
+                intent = 'TOOLS_GDPR';
+            }
 
-Svar KUN med intent-koden.
-`;
-            
-            const result = await geminiModel.generateContent([
-                systemPrompt,
-                `User: ${message}`
-            ]);
-            
-            const response = await result.response;
-            const text = response.text().trim();
-            
-            if (text.includes('_')) {
-                intent = text;
-                botResponse = `[INTENT_DETECTED]: ${intent}`; 
+            if (intent !== 'UNKNOWN') {
+                botResponse = `[INTENT_DETECTED]: ${intent}`;
             } else {
-                intent = 'UNKNOWN';
-                botResponse = 'Fant ingen match i menyen.';
+                botResponse = 'Fant ingen match i menyen. Prøv å velge fra alternativene eller formuler spørsmålet annerledes.';
             }
-
-        } catch (error) {
-            console.error("Gemini Error:", error);
-            intent = 'ERROR';
-            botResponse = 'Beklager, feil med AI-tjenesten.';
         }
-    } else if (mode === 'free_chat' && process.env.GEMINI_API_KEY) {
-        try {
-             const systemPrompt = `
-Du er "Loki", en hjelpsom IT-support assistent for IT-portalen.
-Du svarer på norsk, kort og presist.
-Du hjelper elever og ansatte med IT-spørsmål.
-Du kan referere til portalens sider hvis det passer (f.eks. FAQ, Kurs osv...).
-Hold tonen profesjonell men vennlig.
-`;
-            const result = await geminiModel.generateContent([
-                systemPrompt,
-                `User: ${message}`
-            ]);
-            const response = await result.response;
-            botResponse = response.text().trim();
-            intent = 'FREE_CHAT';
-
-        } catch (error) {
-             console.error("Gemini Free Chat Error:", error);
-             botResponse = "Beklager, jeg fikk problemer med å tenke akkurat nå.";
-        }
-
-
     } else {
-        // Fallback to simple keyword matching (Old Logic) or if API key missing
-        const responses = {
-            'hei': 'Hei! Hvordan kan jeg hjelpe deg?',
-            'hjelp': 'Jeg kan hjelpe med kurs, feilsøking og kontakt.',
-            'passord': 'Glemt passord? Gå til FAQ.',
-            'kontakt': 'Kontakt oss på support@it-portalen.no',
-            'skrivefeil': 'Jeg retter gjerne skrivefeil for deg.'
-        };
-        
-        botResponse = 'Beklager, jeg forstår ikke helt. Prøv "hjelp".';
-        const lowerInput = message.toLowerCase();
-        
-        for (const [key, value] of Object.entries(responses)) {
-            if (lowerInput.includes(key)) {
-                botResponse = value;
-                intent = 'KEYWORD_MATCH';
-                break;
+        // Fri samtale-modus (AI-Assistent med Gemini 3.6 Flash)
+        if (process.env.GEMINI_API_KEY) {
+            const aiReply = await chatMedLokiSupport(message, chatHistory || []);
+            if (aiReply) {
+                botResponse = aiReply;
+                intent = 'FREE_CHAT';
             }
+        }
+
+        // Reserveløsning dersom Gemini-nøkkel mangler
+        if (!botResponse) {
+            const responses = {
+                'hei': 'Hei! Hvordan kan jeg hjelpe deg med IT i dag?',
+                'hjelp': 'Jeg kan hjelpe med kurs, feilsøking, passord og kontakt med IT-avdelingen.',
+                'passord': 'Glemt passord? Du kan tilbakestille det på passord.vlfk.no eller lese vår FAQ.',
+                'wifi': 'Sjekk at du er koblet til Skole-Ansatt eller Skole-Guest, og at flymodus er slått av.',
+                'kontakt': 'Du finner IT-kontoret i 2. etasje (rom 202), åpent hverdager 08:00 - 15:30.'
+            };
+            const lowerInput = message.toLowerCase();
+            botResponse = 'Hei! Jeg er Loki, din IT-assistent. Spør meg om passord, Wi-Fi, veiledninger, koding eller feilsøking!';
+            for (const [key, value] of Object.entries(responses)) {
+                if (lowerInput.includes(key)) {
+                    botResponse = value;
+                    break;
+                }
+            }
+            intent = 'KEYWORD_MATCH';
         }
     }
 
@@ -323,6 +438,74 @@ Hold tonen profesjonell men vennlig.
     };
     
     saveChat();
+});
+
+// --- Loki IDE Socratic Tutor API ---
+app.post('/api/ide/loki-tutor', async (req, res) => {
+    const { message, taskTitle, taskInstructions, code, errors, taskIndex, chatHistory } = req.body;
+    const userId = req.session.userId || null;
+
+    if (!message && message !== "") {
+        return res.status(400).json({ success: false, message: 'Ingen melding mottatt.' });
+    }
+
+    let tutorResponse = "";
+
+    // 1. Forsøk Gemini 3.6 Flash via chatMedKodelærer
+    if (process.env.GEMINI_API_KEY) {
+        tutorResponse = await chatMedKodelærer(
+            message || 'Jeg trenger et hint for å komme videre!',
+            chatHistory || [],
+            { taskTitle, taskInstructions, code, errors }
+        );
+    }
+
+    // 2. Intelligent Socratic fallback if Gemini key is missing or failed
+    if (!tutorResponse) {
+        const lowerMsg = (message || '').toLowerCase();
+        const lowerErrors = (errors || '').toLowerCase();
+        const lowerCode = (code || '').toLowerCase();
+
+        if (lowerMsg.includes('fasit') || lowerMsg.includes('gi meg svaret') || lowerMsg.includes('løsning')) {
+            tutorResponse = "Som din kodelærer kan jeg ikke bare gi deg fasiten – den ekte gleden ligger i å knekke koden selv! 💡 Hva er det første steget i oppgavebeskrivelsen du lurer på?";
+        } else if (lowerErrors.includes('syntaxerror') || lowerErrors.includes('unexpected token')) {
+            tutorResponse = "Terminalen melder om en syntaksfeil! 🔍 Sjekk nøye: Har du glemt et anførselstegn `\"`, en parentes `)`, eller en klammeparentes `}` et sted?";
+        } else if (lowerErrors.includes('is not defined') || lowerErrors.includes('referenceerror')) {
+            tutorResponse = "En variabel eller funksjon er ikke definert. Sjekk om navnet er stavet nøyaktig likt med store og små bokstaver (JavaScript skiller mellom 'minKnapp' og 'minknapp')!";
+        } else if (lowerMsg.includes('feil') || lowerMsg.includes('fungerer ikke') || lowerMsg.includes('virker ikke')) {
+            tutorResponse = "La oss feilsøke sammen! Sjekk konsollen/terminalen i felt 4 nederst til høyre. Hvilken melding dukker opp når du trykker 'Kjør kode'?";
+        } else {
+            // Task-specific Socratic hints
+            const taskHints = [
+                "Husk at en overskrift på øverste nivå i HTML starter med en åpningstagg `<h1...>` og må alltid avsluttes med en lukketagg `</h1>`. Hva har du skrevet inni den?",
+                "Et avsnitt bruker taggen `<p>`. For å gjøre ord fete eller uthevede, hvilken tagg kan du pakke rundt selve ordet?",
+                "Lenker bruker anker-taggen `<a>`. Hvilket attributt må du legge til for å fortelle nettleseren hvor linken skal gå (tenk på Hypertext REFerence)?",
+                "En uordnet liste starter med `<ul>`. Hvilken tagg må du bruke for hvert enkelt listepunkt (List Item) inni der?",
+                "For å sette farge på en tekst i CSS bruker du `color`. Hva bruker du hvis du vil endre fargen på hele bakgrunnen?",
+                "Tenk på boksmodellen: Hvilken egenskap gir luft på innsiden av rammen, og hvilken egenskap gjør hjørnene myke og runde?",
+                "Flexbox er fantastisk for oppsett! Når du har satt `display: flex;` på forelderen, hvilken egenskap styrer sentrering langs hovedaksen?",
+                "Når noen klikker på knappen din, hvilken hendelse (event) lytter du etter? Husker du `onclick` eller `addEventListener`?",
+                "For å finne et element med en bestemt ID i HTML, hvilken metode på `document`-objektet bruker vi?",
+                "I oppgave 10 vil vi sende en hilsen til terminalen. Hvilken innebygd funksjon skriver direkte ut i konsollen? Prøv `console. ...`!"
+            ];
+            const currentHint = taskHints[taskIndex] || "Ta et steg tilbake og les oppgaven nøye. Hva er det neste lille elementet du må legge til?";
+            tutorResponse = `Hei! 🦉 Her er en ledetråd: ${currentHint} Hva tror du skjer hvis du tester dette i editoren?`;
+        }
+    }
+
+    // Save to chat history if possible
+    try {
+        const query = 'INSERT INTO chat_messages (session_id, sender, message_text, intent) VALUES (?, ?, ?, ?)';
+        db.query('INSERT IGNORE INTO chat_sessions (id, user_id) VALUES (?, ?)', [1, userId], () => {
+            db.query(query, [1, 'user', `[IDE Spm]: ${message}`, 'LOKI_TUTOR_QUERY'], () => {
+                db.query(query, [1, 'bot', tutorResponse, 'LOKI_TUTOR_RESPONSE'], () => {
+                    res.json({ success: true, response: tutorResponse });
+                });
+            });
+        });
+    } catch (e) {
+        res.json({ success: true, response: tutorResponse });
+    }
 });
 
 // --- Admin API Routes ---
@@ -669,6 +852,149 @@ app.get('/api/progress', (req, res) => {
         if (err) return res.status(500).json({ success: false, message: err.message });
         res.json({ success: true, data: results });
     });
+});
+
+// --- Teacher Dashboard & MCP Simulator API Routes (Admin) ---
+const simulatorCore = require('./mcp/simulator-core.js');
+
+// 1. Teacher Dashboard KPIs
+app.get('/api/admin/teacher/stats', isAdmin, (req, res) => {
+    const qStudents = 'SELECT COUNT(*) as totalStudents FROM users WHERE role = "student"';
+    const qQuizzes = 'SELECT COUNT(*) as totalAttempts, ROUND(AVG(score / total_questions * 100), 1) as avgClassScore FROM quiz_results';
+    const qCompleted = 'SELECT COUNT(*) as totalCompleted FROM course_progress WHERE is_completed = 1';
+    const qAtRisk = `
+        SELECT COUNT(DISTINCT user_id) as atRiskStudents
+        FROM (
+            SELECT user_id, AVG(score / total_questions * 100) as avg_pct
+            FROM quiz_results
+            GROUP BY user_id
+            HAVING avg_pct < 50
+        ) as struggling
+    `;
+
+    db.query(qStudents, (err, rStudents) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        db.query(qQuizzes, (err, rQuizzes) => {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            db.query(qCompleted, (err, rCompleted) => {
+                if (err) return res.status(500).json({ success: false, message: err.message });
+                db.query(qAtRisk, (err, rAtRisk) => {
+                    if (err) return res.status(500).json({ success: false, message: err.message });
+                    res.json({
+                        success: true,
+                        stats: {
+                            totalStudents: rStudents[0].totalStudents || 0,
+                            totalAttempts: rQuizzes[0].totalAttempts || 0,
+                            avgClassScore: rQuizzes[0].avgClassScore || 0,
+                            totalCompleted: rCompleted[0].totalCompleted || 0,
+                            atRiskStudents: rAtRisk[0].atRiskStudents || 0
+                        }
+                    });
+                });
+            });
+        });
+    });
+});
+
+// 2. All Students Overview for Teacher
+app.get('/api/admin/teacher/students', isAdmin, (req, res) => {
+    const query = `
+        SELECT 
+            u.id, 
+            u.username, 
+            u.email, 
+            u.created_at,
+            COUNT(DISTINCT cp.course_slug) as completed_courses,
+            COUNT(qr.id) as total_quiz_attempts,
+            ROUND(AVG(qr.score / qr.total_questions * 100), 1) as avg_score_pct,
+            MAX(qr.attempted_at) as last_attempt_at
+        FROM users u
+        LEFT JOIN course_progress cp ON u.id = cp.user_id AND cp.is_completed = 1
+        LEFT JOIN quiz_results qr ON u.id = qr.user_id
+        WHERE u.role = 'student'
+        GROUP BY u.id, u.username, u.email, u.created_at
+        ORDER BY u.created_at DESC
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        res.json({ success: true, students: results });
+    });
+});
+
+// 3. Single Student Detailed Breakdown
+app.get('/api/admin/teacher/student/:id', isAdmin, (req, res) => {
+    const studentId = req.params.id;
+    const userQuery = 'SELECT id, username, email, role, created_at FROM users WHERE id = ?';
+    const coursesQuery = 'SELECT course_slug, is_completed, completed_at FROM course_progress WHERE user_id = ?';
+    const historyQuery = 'SELECT id, course_slug, score, total_questions, attempted_at FROM quiz_results WHERE user_id = ? ORDER BY attempted_at DESC';
+
+    db.query(userQuery, [studentId], (err, userRes) => {
+        if (err || userRes.length === 0) return res.status(404).json({ success: false, message: 'Elev ikke funnet' });
+        db.query(coursesQuery, [studentId], (err, courseRes) => {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            db.query(historyQuery, [studentId], (err, historyRes) => {
+                if (err) return res.status(500).json({ success: false, message: err.message });
+                res.json({
+                    success: true,
+                    student: userRes[0],
+                    courses: courseRes,
+                    quizHistory: historyRes
+                });
+            });
+        });
+    });
+});
+
+// 4. Course Analytics for Teacher
+app.get('/api/admin/teacher/courses', isAdmin, (req, res) => {
+    const query = `
+        SELECT 
+            course_slug,
+            COUNT(*) as attempts,
+            COUNT(DISTINCT user_id) as unique_students,
+            ROUND(AVG(score / total_questions * 100), 1) as avg_score_pct,
+            ROUND(MAX(score / total_questions * 100), 1) as highest_pct,
+            ROUND(MIN(score / total_questions * 100), 1) as lowest_pct
+        FROM quiz_results
+        GROUP BY course_slug
+        ORDER BY attempts DESC
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        res.json({ success: true, courses: results });
+    });
+});
+
+// 5. Simulator Trigger Endpoint (Run from Admin UI)
+app.post('/api/admin/simulator/run', isAdmin, async (req, res) => {
+    try {
+        const result = await simulatorCore.runFullSimulation(req.body);
+        res.json({ success: true, ...result });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// 6. Simulator Clear Endpoint (Reset from Admin UI)
+app.post('/api/admin/simulator/clear', isAdmin, async (req, res) => {
+    try {
+        const result = await simulatorCore.clearTestData();
+        res.json({ success: true, ...result });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// 7. Simulator Status Endpoint
+app.get('/api/admin/simulator/summary', isAdmin, async (req, res) => {
+    try {
+        const summary = await simulatorCore.getSimulationSummary();
+        res.json({ success: true, summary });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 app.use(express.static(__dirname));

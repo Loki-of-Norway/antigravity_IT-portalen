@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loki Koding IDE - IT-portalen</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/png" href="/Images/Loki_Brukerstøtte.png">
+  <style>
+    /* ========================================================
+       Loki Developer Studio - 4-Sector IDE
+       Design System matched with IT-portalen
+       ======================================================== */
+    :root {
+      --ide-bg: #0f172a;
+      --ide-panel-bg: #1e293b;
+      --ide-panel-header: #334155;
+      --ide-border: #334155;
+      --ide-text: #f1f5f9;
+      --ide-text-muted: #94a3b8;
+      --ide-accent: #2563eb;
+      --ide-accent-hover: #1d4ed8;
+      --ide-accent-light: #60a5fa;
+      --ide-success: #10b981;
+      --ide-warning: #f59e0b;
+      --ide-danger: #ef4444;
+      --ide-terminal-bg: #020617;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--ide-bg);
+      color: var(--ide-text);
+    }
+
+    /* Top Global IDE Bar */
+    .ide-topbar {
+      height: 48px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--ide-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      z-index: 10;
+    }
+
+    .ide-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .ide-brand img {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+    }
+
+    .ide-brand-badge {
+      font-size: 0.7rem;
+      background: rgba(37, 99, 235, 0.25);
+      color: var(--ide-accent-light);
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ide-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ide-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .ide-btn-primary {
+      background: var(--primary-blue);
+      color: #ffffff;
+      border-color: var(--primary-blue);
+    }
+
+    .ide-btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .ide-btn-outline {
+      background: transparent;
+      border-color: var(--ide-border);
+      color: var(--ide-text);
+    }
+
+    .ide-btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .ide-btn-success {
+      background: #059669;
+      color: #fff;
+    }
+
+    .ide-btn-success:hover {
+      background: #047857;
+    }
+
+    .ide-btn-loki {
+      background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+    }
+
+    .ide-btn-loki:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    /* 4-Sector Dynamic Resizable Grid */
+    .ide-workspace {
+      --top-pct: 70;
+      --left-pct: 50;
+      height: calc(100vh - 48px);
+      display: grid;
+      grid-template-columns: calc(var(--left-pct) * 1% - 3px) calc((100 - var(--left-pct)) * 1% - 3px);
+      grid-template-rows: calc(var(--top-pct) * 1% - 3px) calc((100 - var(--top-pct)) * 1% - 3px);
+      grid-template-areas:
+        "editor  preview"
+        "tasks   terminal";
+      gap: 6px;
+      padding: 6px;
+      background: #090d16;
+      position: relative;
+    }
+
+    .ide-workspace.is-resizing {
+      user-select: none;
+    }
+
+    .ide-workspace.is-resizing iframe {
+      pointer-events: none;
+    }
+
+    #sectorEditor { grid-area: editor; }
+    #sectorPreview { grid-area: preview; }
+    #sectorTasks { grid-area: tasks; }
+    #sectorTerminal { grid-area: terminal; }
+
+    /* Interactive Resizer Splitters */
+    .resizer-h {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: calc(var(--top-pct) * 1% - 6px);
+      height: 12px;
+      cursor: row-resize;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .resizer-h::before {
+      content: '';
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      transition: all 0.15s ease;
+    }
+
+    .resizer-h:hover::before,
+    .resizer-h.active::before {
+      height: 4px;
+      background: var(--primary-light);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+    }
+
+    .resizer-v {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: calc(var(--left-pct) * 1% - 6px);
+      width: 12px;
+      cursor: col-resize;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .resizer-v::before {
+      content: '';
+      height: 100%;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      transition: all 0.15s ease;
+    }
+
+    .resizer-v:hover::before,
+    .resizer-v.active::before {
+      width: 4px;
+      background: var(--primary-light);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+    }
+
+    .resizer-center {
+      position: absolute;
+      top: calc(var(--top-pct) * 1% - 10px);
+      left: calc(var(--left-pct) * 1% - 10px);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 2px solid var(--primary-blue);
+      cursor: move;
+      z-index: 35;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      transition: all 0.15s ease;
+    }
+
+    .resizer-center:hover,
+    .resizer-center.active {
+      background: var(--primary-blue);
+      color: #fff;
+      transform: scale(1.2);
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.8);
+    }
+
+    .resize-tooltip {
+      position: fixed;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--primary-light);
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      z-index: 60;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+    }
+
+    /* Layout Preset Controls in Topbar */
+    .layout-resizer-control {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: #172033;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--ide-border);
+      position: relative;
+    }
+
+    .layout-ctrl-label {
+      font-size: 0.72rem;
+      color: var(--ide-text-muted);
+      margin-right: 3px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .layout-preset-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #cbd5e1;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .layout-preset-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .layout-preset-btn.active {
+      background: var(--primary-blue);
+      color: #ffffff;
+    }
+
+    /* Sliders Popover */
+    .layout-sliders-popover {
+      position: absolute;
+      top: 36px;
+      right: 0;
+      width: 270px;
+      background: #172033;
+      border: 1px solid var(--ide-border);
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      padding: 0.9rem;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .layout-sliders-popover.active {
+      display: flex;
+    }
+
+    .slider-popover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      border-bottom: 1px solid var(--ide-border);
+      padding-bottom: 0.4rem;
+    }
+
+    .close-popover-btn {
+      background: none;
+      border: none;
+      color: var(--ide-text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .close-popover-btn:hover {
+      color: #fff;
+    }
+
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.73rem;
+      color: #cbd5e1;
+    }
+
+    .slider-labels strong {
+      color: var(--ide-accent-light);
+    }
+
+    .slider-row input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary-blue);
+      cursor: pointer;
+    }
+
+    /* Generic Sector Styles */
+    .ide-sector {
+      background: var(--ide-panel-bg);
+      border: 1px solid var(--ide-border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+      min-width: 0;
+      position: relative;
+    }
+
+    .sector-header {
+      height: 38px;
+      background: #172033;
+      border-bottom: 1px solid var(--ide-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0.85rem;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .sector-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      letter-spacing: 0.2px;
+    }
+
+    .sector-title svg {
+      color: var(--ide-accent-light);
+    }
+
+    .sector-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .sector-body {
+      flex: 1;
+      overflow: auto;
+      min-height: 0;
+      position: relative;
+    }
+
+    /* ========================================================
+       SEKTOR: Spørsmål & Oppgaver (Kursguide)
+       ======================================================== */
+    .tasks-container {
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .task-nav-pills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-bottom: 0.35rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--ide-border);
+      flex-shrink: 0;
+    }
+
+    .pill-btn {
+      width: 25px;
+      height: 25px;
+      border-radius: 5px;
+      background: #1e293b;
+      border: 1px solid var(--ide-border);
+      color: var(--ide-text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .pill-btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+
+    .pill-btn.active {
+      background: var(--primary-blue);
+      border-color: var(--primary-light);
+      color: #ffffff;
+      box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
+    }
+
+    .pill-btn.completed {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    .task-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.2rem;
+      flex-shrink: 0;
+    }
+
+    .task-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ide-accent-light);
+      letter-spacing: 0.5px;
+    }
+
+    .task-progress-text {
+      font-size: 0.72rem;
+      color: var(--ide-text-muted);
+    }
+
+    .task-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.2rem;
+      line-height: 1.3;
+      flex-shrink: 0;
+    }
+
+    .task-desc {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+      margin-bottom: 0.35rem;
+    }
+
+    .task-goal-box {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-left: 3px solid var(--ide-accent-light);
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 0.45rem;
+      font-size: 0.79rem;
+    }
+
+    .task-goal-box h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ide-accent-light);
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .task-goal-box ul {
+      padding-left: 1.15rem;
+      color: #e2e8f0;
+    }
+
+    .task-goal-box li {
+      margin-bottom: 0.15rem;
+    }
+
+    .task-actions-bar {
+      margin-top: auto;
+      padding-top: 0.45rem;
+      border-top: 1px solid var(--ide-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .task-validation-msg {
+      padding: 0.4rem 0.65rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .task-validation-msg.success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      display: flex;
+    }
+
+    .task-validation-msg.fail {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+      display: flex;
+    }
+
+    /* ========================================================
+       SEKTOR 2: Kode-editor
+       ======================================================== */
+    .editor-tabs {
+      display: flex;
+      background: #111827;
+      border-bottom: 1px solid var(--ide-border);
+      flex-shrink: 0;
+    }
+
+    .editor-tab {
+      padding: 0.45rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--ide-text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-right: 1px solid var(--ide-border);
+      background: transparent;
+      border-top: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .editor-tab:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .editor-tab.active {
+      color: #ffffff;
+      background: #1e293b;
+      border-top: 2px solid var(--primary-light);
+    }
+
+    .editor-wrapper {
+      position: relative;
+      flex: 1;
+      display: flex;
+      height: calc(100% - 35px);
+      background: #0d1322;
+      overflow: hidden;
+    }
+
+    .line-numbers {
+      width: 42px;
+      padding: 0.75rem 0.4rem;
+      background: #090e1a;
+      color: #475569;
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      text-align: right;
+      user-select: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    .code-textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #f8fafc;
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      padding: 0.75rem 0.85rem;
+      resize: none;
+      tab-size: 2;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+    }
+
+    /* ========================================================
+       SEKTOR 3: Live Preview
+       ======================================================== */
+    .preview-address-bar {
+      height: 28px;
+      background: #111827;
+      border-bottom: 1px solid var(--ide-border);
+      display: flex;
+      align-items: center;
+      padding: 0 0.75rem;
+      gap: 0.6rem;
+      font-size: 0.75rem;
+      color: var(--ide-text-muted);
+    }
+
+    .preview-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+    }
+
+    .preview-url {
+      background: #1e293b;
+      padding: 1px 10px;
+      border-radius: 4px;
+      color: #cbd5e1;
+      font-family: monospace;
+      font-size: 0.75rem;
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .preview-frame {
+      width: 100%;
+      height: calc(100% - 28px);
+      border: none;
+      background: #ffffff;
+    }
+
+    /* ========================================================
+       SEKTOR 4: Terminal & Feilsøking
+       ======================================================== */
+    .terminal-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--ide-terminal-bg);
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      font-size: 0.84rem;
+    }
+
+    .terminal-logs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .term-row {
+      line-height: 1.45;
+      word-break: break-all;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .term-prefix {
+      color: #64748b;
+      user-select: none;
+    }
+
+    .term-log { color: #e2e8f0; }
+    .term-info { color: #38bdf8; }
+    .term-success { color: #4ade80; }
+    .term-warn { color: #facc15; }
+    .term-error {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border-left: 2px solid #ef4444;
+    }
+
+    .term-input-row {
+      height: 36px;
+      background: #090e1a;
+      border-top: 1px solid var(--ide-border);
+      display: flex;
+      align-items: center;
+      padding: 0 0.75rem;
+      gap: 0.5rem;
+    }
+
+    .term-prompt {
+      color: #38bdf8;
+      font-weight: bold;
+    }
+
+    .term-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #f1f5f9;
+      font-family: inherit;
+      font-size: 0.84rem;
+    }
+
+    /* ========================================================
+       Loki Sokratisk Assistent Modal / Drawer
+       ======================================================== */
+    .loki-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .loki-drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .loki-drawer {
+      position: fixed;
+      top: 0;
+      right: -460px;
+      width: 440px;
+      max-width: 90vw;
+      height: 100vh;
+      background: #131c2e;
+      border-left: 1px solid var(--ide-border);
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6);
+      z-index: 101;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .loki-drawer.active {
+      right: 0;
+    }
+
+    .loki-header {
+      padding: 1rem 1.25rem;
+      background: #1a253c;
+      border-bottom: 1px solid var(--ide-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .loki-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .loki-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary-blue);
+      border: 2px solid var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .loki-title-text h3 {
+      font-size: 0.98rem;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .loki-title-text p {
+      font-size: 0.74rem;
+      color: var(--ide-accent-light);
+    }
+
+    .loki-chat-feed {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .loki-msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 88%;
+      line-height: 1.45;
+      font-size: 0.85rem;
+    }
+
+    .loki-msg.bot {
+      align-self: flex-start;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--ide-accent-light);
+      color: #e2e8f0;
+      padding: 0.75rem 0.9rem;
+      border-radius: 0 10px 10px 10px;
+    }
+
+    .loki-msg.user {
+      align-self: flex-end;
+      background: var(--primary-blue);
+      color: #ffffff;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px 10px 0 10px;
+    }
+
+    .loki-quick-prompts {
+      padding: 0.5rem 1rem;
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      background: #0f172a;
+      border-top: 1px solid var(--ide-border);
+    }
+
+    .quick-chip {
+      background: #1e293b;
+      border: 1px solid var(--ide-border);
+      color: #cbd5e1;
+      font-size: 0.74rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .quick-chip:hover {
+      background: var(--primary-blue);
+      color: #fff;
+      border-color: var(--primary-blue);
+    }
+
+    .loki-chat-input-row {
+      padding: 0.85rem 1rem;
+      background: #172033;
+      border-top: 1px solid var(--ide-border);
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .loki-chat-input {
+      flex: 1;
+      background: #090e1a;
+      border: 1px solid var(--ide-border);
+      border-radius: 6px;
+      color: #fff;
+      padding: 0.55rem 0.8rem;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .loki-chat-input:focus {
+      border-color: var(--primary-light);
+    }
+
+    /* Fullscreen Finish Banner */
+    .course-finish-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.95);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .finish-card {
+      background: #1e293b;
+      border: 2px solid var(--primary-blue);
+      border-radius: 12px;
+      max-width: 520px;
+      width: 100%;
+      padding: 2.2rem;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .finish-card h2 {
+      font-size: 1.7rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .finish-card p {
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    /* Responsive for small screens */
+    @media (max-width: 900px) {
+      .ide-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        height: auto;
+        overflow-y: auto;
+      }
+      .ide-sector {
+        min-height: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Global Header Bar -->
+  <header class="ide-topbar">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="/pages/artikler/introduksjon-til-koding.html" class="ide-brand" title="Tilbake til kurset">
+        <img src="/Images/Loki_Brukerstøtte.png" alt="Loki Logo">
+        <span>IT-portalen Koding IDE</span>
+      </a>
+      <span class="ide-brand-badge">Sokratisk Læringsmodus</span>
+    </div>
+
+    <div class="ide-top-actions">
+      <!-- Layout / % Størrelse Controls -->
+      <div class="layout-resizer-control" id="layoutControl">
+        <span class="layout-ctrl-label" title="Endre prosentstørrelse på IDE-sektorene">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="3" y1="14" x2="21" y2="14"/>
+            <line x1="12" y1="3" x2="12" y2="21"/>
+          </svg>
+          <span id="layoutSummaryBadge">70/30</span>
+        </span>
+        <button type="button" class="layout-preset-btn active" data-top="70" data-left="50" title="Standard: Topp 70%, Bunn 30%">70/30</button>
+        <button type="button" class="layout-preset-btn" data-top="50" data-left="50" title="Lik deling: 50/50">50/50</button>
+        <button type="button" class="layout-preset-btn" data-top="60" data-left="50" title="Topp 60%, Bunn 40%">60/40</button>
+        <button type="button" class="layout-preset-btn" data-top="80" data-left="50" title="Maks editor: Topp 80%, Bunn 20%">80/20</button>
+        <button type="button" class="layout-preset-btn" id="openSlidersBtn" title="Juster egne % prosenter med glidebrytere" style="padding: 2px 6px;">⚙️ %</button>
+
+        <!-- Dropdown sliders popover -->
+        <div class="layout-sliders-popover" id="layoutSlidersPopover">
+          <div class="slider-popover-header">
+            <span>📐 Egendefinert % Størrelse</span>
+            <button class="close-popover-btn" id="closeSlidersBtn" type="button" title="Lukk meny">✕</button>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-labels">
+              <span>Høydefordeling (Topp / Bunn):</span>
+              <strong><span id="topPctLabel">70</span>% / <span id="bottomPctLabel">30</span>%</strong>
+            </div>
+            <input type="range" id="topPctSlider" min="20" max="85" value="70" step="1">
+            <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: #64748b;">
+              <span>Mindre editor (20%)</span>
+              <span>Større editor (85%)</span>
+            </div>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-labels">
+              <span>Breddefordeling (Venstre / Høyre):</span>
+              <strong><span id="leftPctLabel">50</span>% / <span id="rightPctLabel">50</span>%</strong>
+            </div>
+            <input type="range" id="leftPctSlider" min="20" max="80" value="50" step="1">
+            <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: #64748b;">
+              <span>Mindre venstre (20%)</span>
+              <span>Mindre høyre (80%)</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
+            <button type="button" class="ide-btn ide-btn-outline" id="resetLayoutBtn" style="flex: 1; padding: 4px 6px; font-size: 0.75rem; justify-content: center;">
+              Tilbakestill til 70/30
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="ide-btn ide-btn-primary" id="runCodeBtn" title="Kjør koden i Live Preview og Terminal (Ctrl+Enter)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span>Kjør kode</span>
+      </button>
+
+      <button class="ide-btn ide-btn-loki" id="openLokiBtn" title="Spør Loki (Sokratisk veileder med Gemini 3.6 Flash)">
+        <span>🦉 Spør Loki</span>
+      </button>
+
+      <a href="/pages/artikler/introduksjon-til-koding.html" class="ide-btn ide-btn-outline" target="_blank" title="Åpne teorisiden">
+        <span>📖 Teori</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- 4-Sector Workspace: 70% Top (Editor & Preview), 30% Bottom (Tasks & Terminal) -->
+  <main class="ide-workspace">
+
+    <!-- ==========================================
+         SEKTOR 1 (Oppe til venstre - 70%): Kode-editor
+         ========================================== -->
+    <section class="ide-sector" id="sectorEditor">
+      <div class="sector-header">
+        <div class="sector-title">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <span>1. Kode-editor</span>
+        </div>
+
+        <div class="sector-tools">
+          <button class="ide-btn ide-btn-outline" id="formatCodeBtn" style="padding: 2px 7px; font-size: 0.75rem;" title="Rens og formater kode">
+            Auto-innrykk
+          </button>
+          <button class="ide-btn ide-btn-primary" id="inlineRunBtn" style="padding: 2px 9px; font-size: 0.75rem;">
+            ▶ Kjør
+          </button>
+        </div>
+      </div>
+
+      <!-- File Tabs -->
+      <div class="editor-tabs">
+        <div class="editor-tab active" data-tab="html">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e44d26" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <span>index.html</span>
+        </div>
+        <div class="editor-tab" data-tab="css">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#264de4" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+          <span>style.css</span>
+        </div>
+        <div class="editor-tab" data-tab="js">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f7df1e" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+          </svg>
+          <span>script.js</span>
+        </div>
+      </div>
+
+      <div class="sector-body">
+        <div class="editor-wrapper">
+          <div class="line-numbers" id="lineNumbers">1</div>
+          <textarea class="code-textarea" id="codeEditor" spellcheck="false" placeholder="Skriv koden din her..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SEKTOR 2 (Oppe til høyre - 70%): Live Preview
+         ========================================== -->
+    <section class="ide-sector" id="sectorPreview">
+      <div class="sector-header">
+        <div class="sector-title">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <span>2. Live Preview (Forhåndsvisning)</span>
+        </div>
+
+        <div class="sector-tools">
+          <button class="ide-btn ide-btn-outline" id="refreshPreviewBtn" style="padding: 2px 7px; font-size: 0.75rem;" title="Oppdater forhåndsvisning">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="sector-body">
+        <div class="preview-address-bar">
+          <span class="preview-dot"></span>
+          <span class="preview-url">http://it-portalen-elev.local/sandbox</span>
+        </div>
+        <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-modals"></iframe>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SEKTOR 3 (Nede til venstre - 30%): Spørsmål & Oppgaver
+         ========================================== -->
+    <section class="ide-sector" id="sectorTasks">
+      <div class="sector-header">
+        <div class="sector-title">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>3. Oppgaver & Spørsmål</span>
+        </div>
+        <div class="sector-tools">
+          <button class="ide-btn ide-btn-outline" id="loadStarterCodeBtn" style="padding: 2px 7px; font-size: 0.75rem;" title="Last inn startmal for oppgaven">
+            Nullstill oppgave
+          </button>
+        </div>
+      </div>
+
+      <div class="sector-body">
+        <div class="tasks-container">
+          <!-- 1-10 Navigation Pills -->
+          <div class="task-nav-pills" id="taskNavPills">
+            <!-- Dynamically populated 1 to 10 -->
+          </div>
+
+          <!-- Current Task Content -->
+          <div class="task-badge-row">
+            <span class="task-badge" id="taskCategoryBadge">HTML GRUNNLEGGENDE</span>
+            <span class="task-progress-text" id="taskProgressCount">Oppgave 1 av 10</span>
+          </div>
+
+          <h2 class="task-title" id="taskTitleText">Laster oppgave...</h2>
+          <p class="task-desc" id="taskDescText">Beskrivelse...</p>
+
+          <div class="task-goal-box" id="taskGoalBox">
+            <h4>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 14 14"/>
+              </svg>
+              Ditt mål i editoren:
+            </h4>
+            <ul id="taskGoalList">
+              <!-- Checklist populated here -->
+            </ul>
+          </div>
+
+          <!-- Result Feedback Box -->
+          <div class="task-validation-msg" id="validationAlert">
+            <span id="validationIcon">✅</span>
+            <span id="validationText">Godt jobbet! Koden er godkjent.</span>
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div class="task-actions-bar">
+            <button class="ide-btn ide-btn-outline" id="prevTaskBtn" style="font-size: 0.78rem;">
+              ◀ Forrige
+            </button>
+
+            <button class="ide-btn ide-btn-success" id="validateTaskBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Test & Sjekk løsning</span>
+            </button>
+
+            <button class="ide-btn ide-btn-primary" id="nextTaskBtn" style="font-size: 0.78rem;">
+              Neste ▶
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SEKTOR 4 (Nede til høyre - 30%): Terminal & Feilsøking
+         ========================================== -->
+    <section class="ide-sector" id="sectorTerminal">
+      <div class="sector-header">
+        <div class="sector-title">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 17 10 11 4 5"/>
+            <line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          <span>4. Terminal & Feilsøking</span>
+        </div>
+
+        <div class="sector-tools">
+          <button class="ide-btn ide-btn-outline" id="clearTerminalBtn" style="padding: 2px 7px; font-size: 0.75rem;" title="Tøm terminalvinduet">
+            Tøm
+          </button>
+        </div>
+      </div>
+
+      <div class="sector-body">
+        <div class="terminal-container">
+          <div class="terminal-logs" id="terminalLogs">
+            <div class="term-row">
+              <span class="term-prefix">[SYSTEM]</span>
+              <span class="term-info">Loki DevTerminal v2.6 klar. Skriv 'help' eller evaluer JavaScript nedenfor.</span>
+            </div>
+            <div class="term-row">
+              <span class="term-prefix">[INFO]</span>
+              <span class="term-log">Trykk 'Kjør kode' for å se utskrifter fra console.log(...) og feilsøke.</span>
+            </div>
+          </div>
+
+          <div class="term-input-row">
+            <span class="term-prompt">&gt;</span>
+            <input type="text" id="terminalInput" class="term-input" placeholder="Skriv JS eller kommando ('run', 'clear', 'hint', 'status')...">
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- Interactive Draggable Splitter Bars -->
+    <div class="resizer-h" id="resizerH" title="Dra for å endre høydefordeling mellom editor/preview og oppgaver/terminal"></div>
+    <div class="resizer-v" id="resizerV" title="Dra for å endre breddefordeling mellom venstre og høyre side"></div>
+    <div class="resizer-center" id="resizerCenter" title="Dra i midtpunktet for å justere begge akser samtidig">✦</div>
+
+    <!-- Live % resize tooltip -->
+    <div class="resize-tooltip" id="resizeTooltip">Topp: 70% | Bunn: 30%</div>
+
+  </main>
+
+  <!-- ==========================================
+       LOKI SOKRATISK CHATBOT DRAWER
+       ========================================== -->
+  <div class="loki-drawer-overlay" id="lokiOverlay"></div>
+  <aside class="loki-drawer" id="lokiDrawer">
+    <div class="loki-header">
+      <div class="loki-profile">
+        <div class="loki-avatar">🦉</div>
+        <div class="loki-title-text">
+          <h3>Loki - Kodelærer</h3>
+          <p>Sokratisk AI • <span style="color:#60a5fa; font-weight: 600;">Gemini 3.6 Flash</span></p>
+        </div>
+      </div>
+      <button class="ide-btn ide-btn-outline" id="closeLokiBtn" style="padding: 4px 8px;">✕</button>
+    </div>
+
+    <div class="loki-chat-feed" id="lokiChatFeed">
+      <div class="loki-msg bot">
+        Hei! Jeg er Loki, din sokratiske kodelærer. 🦉 
+        Jeg gir deg ikke fasiten ferdig servert, men jeg stiller deg de rette spørsmålene så du forstår <em>hvorfor</em> og <em>hvordan</em> koden virker. Hva lurer du på?
+      </div>
+    </div>
+
+    <!-- Quick Question Chips -->
+    <div class="loki-quick-prompts">
+      <button class="quick-chip" onclick="askLokiPrompt('Hva er det første steget jeg bør gjøre her?')">Hva bør jeg gjøre først?</button>
+      <button class="quick-chip" onclick="askLokiPrompt('Hvorfor fungerer ikke koden min?')">Hvorfor fungerer det ikke?</button>
+      <button class="quick-chip" onclick="askLokiPrompt('Forklar feilmeldingen i terminalen')">Forklar terminalfeilen</button>
+      <button class="quick-chip" onclick="askLokiPrompt('Gi meg et sokratisk hint')">💡 Få en ledetråd</button>
+    </div>
+
+    <div class="loki-chat-input-row">
+      <input type="text" id="lokiChatInput" class="loki-chat-input" placeholder="Spør Loki om veiledning...">
+      <button class="ide-btn ide-btn-primary" id="sendLokiChatBtn">Send</button>
+    </div>
+  </aside>
+
+  <!-- ==========================================
+       FULLFØRT KURS MODAL
+       ========================================== -->
+  <div class="course-finish-modal" id="finishModal">
+    <div class="finish-card">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎉 🏆</div>
+      <h2>Gratulerer!</h2>
+      <p>Du har fullført alle 10 oppgavene i <strong>Introduksjon til koding</strong>! Du behersker nå HTML-struktur, CSS-stiler, JavaScript-hendelser og feilsøking i terminalen.</p>
+      
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+        <span style="color: #34d399; font-weight: bold; font-size: 1.1rem;">Poengsum: 10 / 10 Godkjent</span>
+        <p style="font-size: 0.8rem; color: #cbd5e1; margin-top: 0.3rem;">Fremgangen din er lagret i systemet.</p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <a href="/pages/min-fremgang.html" class="ide-btn ide-btn-success" style="padding: 0.6rem 1.2rem;">
+          Se Min Fremgang
+        </a>
+        <button class="ide-btn ide-btn-outline" onclick="document.getElementById('finishModal').style.display='none'" style="padding: 0.6rem 1.2rem;">
+          Lukk & Fortsett å kode
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDE Core Logic Script -->
+  <script>
+    /* ========================================================
+       Loki IDE Engine: 10 MVP Questions & Verification
+       ======================================================== */
+    const TASKS = [
+      {
+        id: 1,
+        category: "HTML GRUNNLEGGENDE",
+        title: "Din første overskrift",
+        desc: "Alle nettsider trenger en tydelig hovedtittel. I HTML bruker vi h1 for det aller viktigste overskriftsnivået.",
+        goals: [
+          "Opprett et h1-element med teksten: <code>Hei, verden!</code>",
+          "Husk både åpnings- og lukketagg: <code>&lt;h1&gt;...&lt;/h1&gt;</code>"
+        ],
+        starters: {
+          html: "<!-- Skriv overskriften din nedenfor -->\n",
+          css: "/* Valgfri styling */\nh1 {\n  font-family: sans-serif;\n}",
+          js: "// JavaScript kan stå tomt her\n"
+        },
+        validator: (html, css, js) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const h1 = doc.querySelector('h1');
+          if (!h1) return { pass: false, msg: "Fant ingen <h1>-tagg i koden din. Prøv å skrive <h1>Hei, verden!</h1>" };
+          if (!h1.textContent.trim()) return { pass: false, msg: "Overskriften <h1> er tom! Skriv noe inni den, f.eks. 'Hei, verden!'." };
+          return { pass: true, msg: "Flott! Du har opprettet en gyldig HTML-overskrift." };
+        }
+      },
+      {
+        id: 2,
+        category: "HTML TEKST & AVSNITT",
+        title: "Avsnitt og uthevet tekst",
+        desc: "Brødtekst organiseres i avsnitt med &lt;p&gt;. For å utheve viktige ord bruker vi &lt;strong&gt;.",
+        goals: [
+          "Behold overskriften din.",
+          "Legg til et <code>&lt;p&gt;</code>-avsnitt med en valgfri setning.",
+          "Pakk minst ett ord inn i <code>&lt;strong&gt;</code> for å gjøre det fet."
+        ],
+        starters: {
+          html: "<h1>Min Nettside</h1>\n<!-- Legg til et <p>-avsnitt med <strong> under her -->\n",
+          css: "body { font-family: sans-serif; }",
+          js: ""
+        },
+        validator: (html, css, js) => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const p = doc.querySelector('p');
+          if (!p) return { pass: false, msg: "Mangler <p>-element for avsnitt." };
+          const strong = doc.querySelector('p strong, p b');
+          if (!strong) return { pass: false, msg: "Finner ingen <strong>- eller <b>-tagg inni avsnittet ditt." };
+          return { pass: true, msg: "Super! Du mestrer avsnitt og utheving av tekst." };
+        }
+      },
+      {
+        id: 3,
+        category: "HTML LENKER & ANKER",
+        title: "Opprett en hyperkobling",
+        desc: "Internett er bygget på lenker (hyperlenker). Vi bruker anker-taggen &lt;a&gt; med attributtet 'href'.",
+        goals: [
+          "Opprett en lenke med taggen <code>&lt;a&gt;</code>.",
+          "Sett attributtet <code>href</code> til for eksempel <code>https://it-portalen.no</code>.",
+          "Skriv en beskrivende lenketekst, f.eks. 'Besøk IT-portalen'."
+        ],
+        starters: {
+          html: "<h1>Lenker i HTML</h1>\n<p>Her er en nyttig ressurs:</p>\n<!-- Lag en <a>-lenke under -->\n",
+          css: "a { color: #2563eb; font-weight: bold; }",
+          js: ""
+        },
+        validator: (html, css, js) => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const a = doc.querySelector('a');
+          if (!a) return { pass: false, msg: "Finner ingen <a>-tagg." };
+          if (!a.getAttribute('href')) return { pass: false, msg: "Lenken mangler 'href'-attributt! F.eks: <a href=\"https://it-portalen.no\">...</a>" };
+          if (!a.textContent.trim()) return { pass: false, msg: "Husk å gi lenken en synlig tekst." };
+          return { pass: true, msg: "Perfekt! Du har laget en klikkbar HTML-lenke." };
+        }
+      },
+      {
+        id: 4,
+        category: "HTML LISTER",
+        title: "Strukturerte lister (ul og li)",
+        desc: "Punktlister er kjempenyttige for menyer, sjekklister og IT-utstyr.",
+        goals: [
+          "Opprett en uordnet liste med <code>&lt;ul&gt;</code>.",
+          "Legg til minst 3 listepunkter med <code>&lt;li&gt;</code> inni listen (f.eks. Tastatur, Mus, Skjerm)."
+        ],
+        starters: {
+          html: "<h2>Mitt IT-utstyr</h2>\n<!-- Opprett <ul> med minst 3 <li> her -->\n",
+          css: "ul { line-height: 1.8; }",
+          js: ""
+        },
+        validator: (html, css, js) => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const ul = doc.querySelector('ul');
+          if (!ul) return { pass: false, msg: "Finner ingen <ul>-liste." };
+          const lis = ul.querySelectorAll('li');
+          if (lis.length < 3) return { pass: false, msg: `Listen har ${lis.length} punkter, men målet krever minst 3 <li>-elementer.` };
+          return { pass: true, msg: "Kjempebra! Du har satt opp en ren strukturert liste." };
+        }
+      },
+      {
+        id: 5,
+        category: "CSS FARGER & TYPOGRAFI",
+        title: "Gi liv til siden med CSS",
+        desc: "CSS (Cascading Style Sheets) bestemmer farger, skrift og utseende. Åpne 'style.css'-fanen eller skriv CSS.",
+        goals: [
+          "Velg <code>style.css</code>-fanen i editoren.",
+          "Gi overskriften <code>h1</code> en farge, f.eks: <code>color: #2563eb;</code>.",
+          "Sett en bakgrunnsfarge på <code>body</code> eller et element med <code>background-color</code>."
+        ],
+        starters: {
+          html: "<h1>Fargerik Overskrift</h1>\n<p>CSS gjør kjedelig HTML om til profesjonell design.</p>",
+          css: "/* Skriv CSS-reglene her */\nh1 {\n  color: #2563eb;\n}\n\nbody {\n  background-color: #f8fafc;\n}",
+          js: ""
+        },
+        validator: (html, css, js) => {
+          const combined = (html + " " + css).toLowerCase();
+          if (!combined.includes('color:') && !combined.includes('color :')) {
+            return { pass: false, msg: "Fant ingen 'color'-egenskap i CSS." };
+          }
+          if (!combined.includes('background') && !combined.includes('background-color')) {
+            return { pass: false, msg: "Husk å sette en 'background-color' eller 'background' i CSS." };
+          }
+          return { pass: true, msg: "Riktig! Farger og typografi er nå på plass." };
+        }
+      },
+      {
+        id: 6,
+        category: "CSS BOKSMODELLEN",
+        title: "Boksmodellen: Padding og Rammer",
+        desc: "Alle HTML-elementer er rektangulære bokser. Padding gir luft på innsiden, og border-radius runder av hjørnene.",
+        goals: [
+          "Lag en boks i HTML, f.eks: <code>&lt;div class=\"boks\"&gt;Innhold&lt;/div&gt;</code>.",
+          "I CSS: Gi boksen <code>padding</code> (f.eks. 16px).",
+          "Gi boksen en myk kant med <code>border-radius</code> (f.eks. 8px)."
+        ],
+        starters: {
+          html: "<div class=\"kort\">\n  <h3>IT-Støtte Boks</h3>\n  <p>Dette er et stilisert kort med god luft.</p>\n</div>",
+          css: ".kort {\n  background: #ffffff;\n  border: 1px solid #cbd5e1;\n  /* Legg til padding og border-radius nedenfor */\n  padding: 16px;\n  border-radius: 8px;\n}",
+          js: ""
+        },
+        validator: (html, css, js) => {
+          const combined = (html + " " + css).toLowerCase();
+          if (!combined.includes('padding')) return { pass: false, msg: "Mangler 'padding' for å gi luft inni boksen." };
+          if (!combined.includes('border-radius')) return { pass: false, msg: "Mangler 'border-radius' for å avrunde hjørnene." };
+          return { pass: true, msg: "Utmerket! Du forstår boksmodellens grunnprinsipper." };
+        }
+      },
+      {
+        id: 7,
+        category: "CSS LAYOUT & FLEXBOX",
+        title: "Moderne layout med Flexbox",
+        desc: "Flexbox gjør det lekende lett å plassere elementer ved siden av hverandre og sentrere innhold.",
+        goals: [
+          "Lag en beholder i CSS med <code>display: flex;</code>.",
+          "Bruk <code>justify-content: center;</code> eller <code>gap: 10px;</code> for å organisere elementene."
+        ],
+        starters: {
+          html: "<div class=\"container\">\n  <div class=\"knapp-boks\">Knapp 1</div>\n  <div class=\"knapp-boks\">Knapp 2</div>\n</div>",
+          css: ".container {\n  display: flex;\n  justify-content: center;\n  gap: 12px;\n  padding: 20px;\n}\n\n.knapp-boks {\n  background: #2563eb;\n  color: white;\n  padding: 10px 18px;\n  border-radius: 6px;\n}",
+          js: ""
+        },
+        validator: (html, css, js) => {
+          const combined = (html + " " + css).toLowerCase();
+          if (!combined.includes('display: flex') && !combined.includes('display:flex')) {
+            return { pass: false, msg: "Mangler 'display: flex;' på container-klassen din." };
+          }
+          if (!combined.includes('justify-content') && !combined.includes('gap')) {
+            return { pass: false, msg: "Prøv å legge til 'justify-content: center;' eller 'gap' for å fordele boksene." };
+          }
+          return { pass: true, msg: "Strålende! Flexbox er nøkkelen til responsiv webdesign." };
+        }
+      },
+      {
+        id: 8,
+        category: "JAVASCRIPT HENDELSER",
+        title: "Interaktivitet med knapper",
+        desc: "JavaScript gjør nettsiden levende. Her skal vi lage en knapp og koble til en lytter når noen klikker.",
+        goals: [
+          "Lag en knapp i HTML: <code>&lt;button id=\"minKnapp\"&gt;Klikk meg&lt;/button&gt;</code>.",
+          "I JavaScript-fanen: Legg til en klikk-hendelse med <code>addEventListener('click', ...)</code> eller <code>onclick</code>."
+        ],
+        starters: {
+          html: "<h3>JavaScript Knapp</h3>\n<button id=\"minKnapp\">Trykk på meg</button>",
+          css: "button {\n  background: #2563eb;\n  color: white;\n  padding: 10px 18px;\n  border: none;\n  border-radius: 6px;\n  cursor: pointer;\n}",
+          js: "const knapp = document.getElementById('minKnapp');\nif (knapp) {\n  knapp.addEventListener('click', function() {\n    alert('Knappen ble trykket!');\n  });\n}"
+        },
+        validator: (html, css, js) => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const btn = doc.querySelector('button');
+          if (!btn) return { pass: false, msg: "Fant ingen <button> i HTML." };
+          const combined = (html + " " + js).toLowerCase();
+          if (!combined.includes('click') && !combined.includes('onclick')) {
+            return { pass: false, msg: "Finner ingen klikk-hendelse ('click' eller 'onclick') i JavaScript eller HTML." };
+          }
+          return { pass: true, msg: "Bravo! Du har koblet brukerens klikk til JavaScript-kode." };
+        }
+      },
+      {
+        id: 9,
+        category: "JAVASCRIPT & DOM",
+        title: "Endre tekst dynamisk med DOM",
+        desc: "DOM (Document Object Model) lar JavaScript endre tekst og HTML i nettleseren i sanntid.",
+        goals: [
+          "I HTML: Lag et element med en ID, f.eks: <code>&lt;p id=\"status\"&gt;Original tekst&lt;/p&gt;</code>.",
+          "I JavaScript: Hent elementet med <code>document.getElementById('status')</code>.",
+          "Endre teksten ved å sette <code>.textContent = 'Ny oppdatert tekst!'</code>."
+        ],
+        starters: {
+          html: "<h3>DOM Manipulering</h3>\n<p id=\"status\">Venter på handling...</p>\n<button id=\"endreTekstBtn\">Oppdater status</button>",
+          css: "#status { font-weight: bold; color: #1e293b; }",
+          js: "document.getElementById('endreTekstBtn').addEventListener('click', () => {\n  document.getElementById('status').textContent = '✅ Status er oppdatert av JavaScript!';\n});"
+        },
+        validator: (html, css, js) => {
+          const combined = (html + " " + js).toLowerCase();
+          if (!combined.includes('getelementbyid') && !combined.includes('queryselector')) {
+            return { pass: false, msg: "Mangler 'document.getElementById' eller 'querySelector' i JavaScript." };
+          }
+          if (!combined.includes('textcontent') && !combined.includes('innerhtml') && !combined.includes('innertext')) {
+            return { pass: false, msg: "Husk å sette '.textContent' eller '.innerHTML' for å endre teksten." };
+          }
+          return { pass: true, msg: "Imponerende! Du styrer nå nettsidens innhold direkte med kode." };
+        }
+      },
+      {
+        id: 10,
+        category: "FEILSØKING & TERMINAL",
+        title: "Feilsøking med console.log og variabler",
+        desc: "En dyktig utvikler må kunne feilsøke. Med console.log sender du beskjeder direkte til terminalen for inspeksjon.",
+        goals: [
+          "I JavaScript: Opprett en variabel med <code>let</code> eller <code>const</code> (f.eks: <code>let feilsoker = 'Loki';</code>).",
+          "Bruk <code>console.log(...)</code> til å skrive ut en hilsen til terminalen med variabelen.",
+          "Trykk 'Kjør kode' og bekreft at meldingen dukker opp i Sektor 4 (Terminalen)!"
+        ],
+        starters: {
+          html: "<h3>Terminal & Feilsøking</h3>\n<p>Se i Sektor 4 nederst til høyre for utskrifter fra koden din!</p>",
+          css: "body { font-family: monospace; }",
+          js: "// 1. Opprett en variabel\nconst mittNavn = 'Elev';\n\n// 2. Skriv til terminalen\nconsole.log('🚀 Terminal-feilsøking aktivert for: ' + mittNavn);\nconsole.log('✅ Gratulerer, alle 10 steg er fullført!');"
+        },
+        validator: (html, css, js) => {
+          const lowerJs = js.toLowerCase();
+          if (!lowerJs.includes('console.log')) {
+            return { pass: false, msg: "Mangler 'console.log(...)' i JavaScript-koden din." };
+          }
+          if (!lowerJs.includes('let ') && !lowerJs.includes('const ') && !lowerJs.includes('var ')) {
+            return { pass: false, msg: "Definer en variabel med 'let' eller 'const' før du skriver den ut." };
+          }
+          return { pass: true, msg: "Fantastisk! Du behersker logging og systematisk feilsøking." };
+        }
+      }
+    ];
+
+    // State
+    let currentTaskIdx = 0;
+    let activeEditorTab = 'html';
+    let codeFiles = {
+      html: TASKS[0].starters.html,
+      css: TASKS[0].starters.css,
+      js: TASKS[0].starters.js
+    };
+    let completedTasks = new Set();
+    let terminalHistory = [];
+
+    // DOM Elements
+    const codeEditor = document.getElementById('codeEditor');
+    const lineNumbers = document.getElementById('lineNumbers');
+    const previewFrame = document.getElementById('previewFrame');
+    const terminalLogs = document.getElementById('terminalLogs');
+    const terminalInput = document.getElementById('terminalInput');
+    const taskNavPills = document.getElementById('taskNavPills');
+    const taskTitleText = document.getElementById('taskTitleText');
+    const taskDescText = document.getElementById('taskDescText');
+    const taskGoalList = document.getElementById('taskGoalList');
+    const taskCategoryBadge = document.getElementById('taskCategoryBadge');
+    const taskProgressCount = document.getElementById('taskProgressCount');
+    const validationAlert = document.getElementById('validationAlert');
+    const validationText = document.getElementById('validationText');
+    const validationIcon = document.getElementById('validationIcon');
+
+    // Initialize Pills
+    function initPills() {
+      taskNavPills.innerHTML = '';
+      TASKS.forEach((t, i) => {
+        const btn = document.createElement('button');
+        btn.className = `pill-btn ${i === currentTaskIdx ? 'active' : ''} ${completedTasks.has(i) ? 'completed' : ''}`;
+        btn.textContent = i + 1;
+        btn.title = `Oppgave ${i + 1}: ${t.title}`;
+        btn.onclick = () => switchTask(i);
+        taskNavPills.appendChild(btn);
+      });
+    }
+
+    // Switch Task
+    function switchTask(idx) {
+      if (idx < 0 || idx >= TASKS.length) return;
+      currentTaskIdx = idx;
+      const t = TASKS[idx];
+
+      // Update Texts
+      taskCategoryBadge.textContent = t.category;
+      taskProgressCount.textContent = `Oppgave ${idx + 1} av 10`;
+      taskTitleText.textContent = `${idx + 1}. ${t.title}`;
+      taskDescText.innerHTML = t.desc;
+      
+      taskGoalList.innerHTML = '';
+      t.goals.forEach(g => {
+        const li = document.createElement('li');
+        li.innerHTML = g;
+        taskGoalList.appendChild(li);
+      });
+
+      // Load starter code if editor is pristine or user asked
+      codeFiles.html = t.starters.html;
+      codeFiles.css = t.starters.css;
+      codeFiles.js = t.starters.js;
+      codeEditor.value = codeFiles[activeEditorTab];
+
+      validationAlert.style.display = 'none';
+      updateLineNumbers();
+      initPills();
+      runCode();
+
+      logToTerminal(`[KURS] Byttet til Oppgave ${idx + 1}: "${t.title}".`, 'info');
+    }
+
+    // Switch Editor Tab
+    document.querySelectorAll('.editor-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Save current tab content
+        codeFiles[activeEditorTab] = codeEditor.value;
+        
+        activeEditorTab = tab.dataset.tab;
+        codeEditor.value = codeFiles[activeEditorTab] || '';
+        updateLineNumbers();
+      });
+    });
+
+    // Update Line Numbers
+    function updateLineNumbers() {
+      const lines = codeEditor.value.split('\n').length;
+      let lineStr = '';
+      for (let i = 1; i <= Math.max(lines, 1); i++) {
+        lineStr += i + '\n';
+      }
+      lineNumbers.textContent = lineStr;
+    }
+
+    codeEditor.addEventListener('input', () => {
+      codeFiles[activeEditorTab] = codeEditor.value;
+      updateLineNumbers();
+    });
+
+    // Tab key in textarea
+    codeEditor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = codeEditor.selectionStart;
+        const end = codeEditor.selectionEnd;
+        codeEditor.value = codeEditor.value.substring(0, start) + "  " + codeEditor.value.substring(end);
+        codeEditor.selectionStart = codeEditor.selectionEnd = start + 2;
+        codeFiles[activeEditorTab] = codeEditor.value;
+        updateLineNumbers();
+      } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        runCode();
+      }
+    });
+
+    // Terminal Logger
+    function logToTerminal(msg, type = 'log') {
+      const row = document.createElement('div');
+      row.className = `term-row`;
+      
+      const prefix = document.createElement('span');
+      prefix.className = 'term-prefix';
+      prefix.textContent = `[${new Date().toLocaleTimeString()}]`;
+
+      const text = document.createElement('span');
+      text.className = `term-${type}`;
+      text.textContent = msg;
+
+      row.appendChild(prefix);
+      row.appendChild(text);
+      terminalLogs.appendChild(row);
+      terminalLogs.scrollTop = terminalLogs.scrollHeight;
+    }
+
+    // Run Code inside Sandboxed iframe with Console intercept
+    function runCode() {
+      codeFiles[activeEditorTab] = codeEditor.value;
+
+      const html = codeFiles.html || '';
+      const css = codeFiles.css || '';
+      const js = codeFiles.js || '';
+
+      const fullSource = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { margin: 10px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+            ${css}
+          </style>
+        </head>
+        <body>
+          ${html}
+          <script>
+            // Intercept console.log, warn, error
+            (function() {
+              const origLog = console.log;
+              const origWarn = console.warn;
+              const origError = console.error;
+
+              console.log = function(...args) {
+                window.parent.postMessage({ type: 'CONSOLE_LOG', level: 'log', message: args.join(' ') }, '*');
+                origLog.apply(console, args);
+              };
+              console.warn = function(...args) {
+                window.parent.postMessage({ type: 'CONSOLE_LOG', level: 'warn', message: args.join(' ') }, '*');
+                origWarn.apply(console, args);
+              };
+              console.error = function(...args) {
+                window.parent.postMessage({ type: 'CONSOLE_LOG', level: 'error', message: args.join(' ') }, '*');
+                origError.apply(console, args);
+              };
+
+              // Catch runtime errors
+              window.onerror = function(message, source, lineno, colno, error) {
+                window.parent.postMessage({ 
+                  type: 'CONSOLE_ERROR', 
+                  message: message + ' (linje ' + lineno + ')' 
+                }, '*');
+                return false;
+              };
+            })();
+
+            try {
+              ${js}
+            } catch(e) {
+              console.error('Kjøretidsfeil: ' + e.message);
+            }
+          <\/script>
+        </body>
+        </html>
+      `;
+
+      previewFrame.srcdoc = fullSource;
+      logToTerminal('Koden ble kompilert og oppdatert i Live Preview.', 'info');
+    }
+
+    // Listen for messages from iframe
+    window.addEventListener('message', (event) => {
+      if (!event.data) return;
+      if (event.data.type === 'CONSOLE_LOG') {
+        logToTerminal(event.data.message, event.data.level || 'log');
+      } else if (event.data.type === 'CONSOLE_ERROR') {
+        logToTerminal(`⚠️ FEIL: ${event.data.message}`, 'error');
+      }
+    });
+
+    // Validate current task
+    function validateCurrentTask() {
+      runCode();
+      const t = TASKS[currentTaskIdx];
+      const result = t.validator(codeFiles.html, codeFiles.css, codeFiles.js);
+
+      validationAlert.style.display = 'flex';
+      if (result.pass) {
+        validationAlert.className = 'task-validation-msg success';
+        validationIcon.textContent = '✅';
+        validationText.textContent = result.msg;
+        completedTasks.add(currentTaskIdx);
+        initPills();
+        logToTerminal(`[VERIFIKASJON] Oppgave ${currentTaskIdx + 1} BESTÅTT! 🎉`, 'success');
+
+        // Check if all completed
+        if (completedTasks.size === 10) {
+          saveOverallProgress();
+          document.getElementById('finishModal').style.display = 'flex';
+        }
+      } else {
+        validationAlert.className = 'task-validation-msg fail';
+        validationIcon.textContent = '💡';
+        validationText.textContent = result.msg;
+        logToTerminal(`[HINT] Oppgave ${currentTaskIdx + 1}: ${result.msg}`, 'warn');
+      }
+    }
+
+    // Save Overall Course Progress to Backend API
+    function saveOverallProgress() {
+      fetch('/api/progress/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseSlug: 'intro-coding',
+          score: 10,
+          totalQuestions: 10
+        })
+      }).then(res => res.json()).then(data => {
+        logToTerminal('Fremgang lagret til din profil i databasen!', 'success');
+      }).catch(err => console.error(err));
+
+      // Also set course completed
+      fetch('/api/progress/course', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseSlug: 'intro-coding',
+          isCompleted: true
+        })
+      }).catch(err => console.error(err));
+    }
+
+    // Terminal Commands
+    terminalInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = terminalInput.value.trim();
+        if (!cmd) return;
+        terminalInput.value = '';
+        logToTerminal(`> ${cmd}`, 'info');
+
+        if (cmd === 'clear' || cmd === 'cls') {
+          terminalLogs.innerHTML = '';
+        } else if (cmd === 'help') {
+          logToTerminal("Kommandoer: 'run' (kjør kode), 'clear' (tøm), 'hint' (få sokratisk råd), 'test' (valider oppgave), 'status' (fremgang)", 'info');
+        } else if (cmd === 'run') {
+          runCode();
+        } else if (cmd === 'test' || cmd === 'check') {
+          validateCurrentTask();
+        } else if (cmd === 'hint') {
+          askLokiPrompt("Gi meg en ledetråd for denne oppgaven!");
+        } else if (cmd === 'status') {
+          logToTerminal(`Du har fullført ${completedTasks.size} av 10 oppgaver.`, 'info');
+        } else {
+          // Eval as JS expression
+          try {
+            const evalResult = eval(cmd);
+            logToTerminal(`<- ${evalResult}`, 'success');
+          } catch (err) {
+            logToTerminal(`Feil: ${err.message}`, 'error');
+          }
+        }
+      }
+    });
+
+    // Loki Drawer Handlers
+    const lokiDrawer = document.getElementById('lokiDrawer');
+    const lokiOverlay = document.getElementById('lokiOverlay');
+    const openLokiBtn = document.getElementById('openLokiBtn');
+    const closeLokiBtn = document.getElementById('closeLokiBtn');
+    const lokiChatFeed = document.getElementById('lokiChatFeed');
+    const lokiChatInput = document.getElementById('lokiChatInput');
+    const sendLokiChatBtn = document.getElementById('sendLokiChatBtn');
+
+    function toggleLoki(open) {
+      if (open) {
+        lokiDrawer.classList.add('active');
+        lokiOverlay.classList.add('active');
+        lokiChatInput.focus();
+      } else {
+        lokiDrawer.classList.remove('active');
+        lokiOverlay.classList.remove('active');
+      }
+    }
+
+    openLokiBtn.onclick = () => toggleLoki(true);
+    closeLokiBtn.onclick = () => toggleLoki(false);
+    lokiOverlay.onclick = () => toggleLoki(false);
+
+    // Conversational Chat History for Gemini 3.6 Flash
+    const lokiChatHistory = [];
+
+    // Send Message to Socratic Loki Tutor (Gemini 3.6 Flash)
+    async function sendLokiMessage(userMsg) {
+      if (!userMsg.trim()) return;
+
+      // Append User Msg to UI
+      const userBubble = document.createElement('div');
+      userBubble.className = 'loki-msg user';
+      userBubble.textContent = userMsg;
+      lokiChatFeed.appendChild(userBubble);
+      lokiChatInput.value = '';
+      lokiChatFeed.scrollTop = lokiChatFeed.scrollHeight;
+
+      // Thinking indicator
+      const thinkingBubble = document.createElement('div');
+      thinkingBubble.className = 'loki-msg bot';
+      thinkingBubble.textContent = "Loki & Gemini 3.6 Flash tenker... 🦉";
+      lokiChatFeed.appendChild(thinkingBubble);
+      lokiChatFeed.scrollTop = lokiChatFeed.scrollHeight;
+
+      // Gather current context
+      const currentTask = TASKS[currentTaskIdx];
+      const combinedCode = `HTML:\n${codeFiles.html}\n\nCSS:\n${codeFiles.css}\n\nJS:\n${codeFiles.js}`;
+      
+      try {
+        const response = await fetch('/api/ide/loki-tutor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: userMsg,
+            taskIndex: currentTaskIdx,
+            taskTitle: currentTask ? currentTask.title : '',
+            taskInstructions: currentTask ? currentTask.goals.join(', ') : '',
+            code: combinedCode,
+            errors: terminalLogs.innerText.slice(-300),
+            chatHistory: lokiChatHistory
+          })
+        });
+
+        const data = await response.json();
+        thinkingBubble.remove();
+
+        const botReply = data.response || "Hva tror du mangler her? Sjekk instruksen en gang til!";
+        const botBubble = document.createElement('div');
+        botBubble.className = 'loki-msg bot';
+        botBubble.textContent = botReply;
+        lokiChatFeed.appendChild(botBubble);
+        lokiChatFeed.scrollTop = lokiChatFeed.scrollHeight;
+
+        // Keep history for multi-turn Gemini 3.6 Flash conversation
+        lokiChatHistory.push({ role: 'user', parts: [{ text: userMsg }] });
+        lokiChatHistory.push({ role: 'model', parts: [{ text: botReply }] });
+
+      } catch (err) {
+        thinkingBubble.textContent = "Husk at hver tagg må åpnes og lukkes riktig. Hva ser du i koden din?";
+      }
+    }
+
+    sendLokiChatBtn.onclick = () => sendLokiMessage(lokiChatInput.value);
+    lokiChatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendLokiMessage(lokiChatInput.value);
+    });
+
+    window.askLokiPrompt = function(promptText) {
+      toggleLoki(true);
+      sendLokiMessage(promptText);
+    };
+
+    // ==========================================
+    // DYNAMIC % LAYOUT RESIZER & CONTROLS
+    // ==========================================
+    const workspace = document.querySelector('.ide-workspace');
+    const resizerH = document.getElementById('resizerH');
+    const resizerV = document.getElementById('resizerV');
+    const resizerCenter = document.getElementById('resizerCenter');
+    const resizeTooltip = document.getElementById('resizeTooltip');
+
+    const layoutSummaryBadge = document.getElementById('layoutSummaryBadge');
+    const presetButtons = document.querySelectorAll('.layout-preset-btn[data-top]');
+    const openSlidersBtn = document.getElementById('openSlidersBtn');
+    const closeSlidersBtn = document.getElementById('closeSlidersBtn');
+    const layoutSlidersPopover = document.getElementById('layoutSlidersPopover');
+    const resetLayoutBtn = document.getElementById('resetLayoutBtn');
+
+    const topPctSlider = document.getElementById('topPctSlider');
+    const leftPctSlider = document.getElementById('leftPctSlider');
+    const topPctLabel = document.getElementById('topPctLabel');
+    const bottomPctLabel = document.getElementById('bottomPctLabel');
+    const leftPctLabel = document.getElementById('leftPctLabel');
+    const rightPctLabel = document.getElementById('rightPctLabel');
+
+    let currentTopPct = 70;
+    let currentLeftPct = 50;
+
+    function setLayout(topPct, leftPct, save = true) {
+      // Clamp boundaries
+      topPct = Math.max(15, Math.min(85, Math.round(Number(topPct))));
+      leftPct = Math.max(20, Math.min(80, Math.round(Number(leftPct))));
+
+      currentTopPct = topPct;
+      currentLeftPct = leftPct;
+
+      // Apply CSS custom properties
+      workspace.style.setProperty('--top-pct', topPct);
+      workspace.style.setProperty('--left-pct', leftPct);
+
+      // Update Topbar badge & labels
+      if (layoutSummaryBadge) {
+        layoutSummaryBadge.textContent = `${topPct}/${100 - topPct}`;
+      }
+      if (topPctLabel) topPctLabel.textContent = topPct;
+      if (bottomPctLabel) bottomPctLabel.textContent = (100 - topPct);
+      if (leftPctLabel) leftPctLabel.textContent = leftPct;
+      if (rightPctLabel) rightPctLabel.textContent = (100 - leftPct);
+
+      // Update Sliders if not actively focused
+      if (topPctSlider && document.activeElement !== topPctSlider) {
+        topPctSlider.value = topPct;
+      }
+      if (leftPctSlider && document.activeElement !== leftPctSlider) {
+        leftPctSlider.value = leftPct;
+      }
+
+      // Update active preset button
+      presetButtons.forEach(btn => {
+        const bTop = Number(btn.getAttribute('data-top'));
+        const bLeft = Number(btn.getAttribute('data-left'));
+        if (bTop === topPct && bLeft === leftPct) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      if (save) {
+        try {
+          localStorage.setItem('itportalen_ide_top_pct', topPct);
+          localStorage.setItem('itportalen_ide_left_pct', leftPct);
+        } catch(e) {}
+      }
+    }
+
+    // Load saved layout preferences
+    try {
+      const savedTop = localStorage.getItem('itportalen_ide_top_pct');
+      const savedLeft = localStorage.getItem('itportalen_ide_left_pct');
+      if (savedTop !== null && savedLeft !== null) {
+        setLayout(Number(savedTop), Number(savedLeft), false);
+      } else {
+        setLayout(70, 50, false);
+      }
+    } catch(e) {
+      setLayout(70, 50, false);
+    }
+
+    // Preset Buttons Click
+    presetButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const top = Number(btn.getAttribute('data-top'));
+        const left = Number(btn.getAttribute('data-left'));
+        setLayout(top, left);
+        if (layoutSlidersPopover) layoutSlidersPopover.classList.remove('active');
+      });
+    });
+
+    // Slider inputs
+    if (topPctSlider) {
+      topPctSlider.addEventListener('input', (e) => {
+        setLayout(Number(e.target.value), currentLeftPct);
+      });
+    }
+    if (leftPctSlider) {
+      leftPctSlider.addEventListener('input', (e) => {
+        setLayout(currentTopPct, Number(e.target.value));
+      });
+    }
+
+    // Popover Toggles
+    if (openSlidersBtn) {
+      openSlidersBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        layoutSlidersPopover.classList.toggle('active');
+      });
+    }
+    if (closeSlidersBtn) {
+      closeSlidersBtn.addEventListener('click', () => {
+        layoutSlidersPopover.classList.remove('active');
+      });
+    }
+    if (resetLayoutBtn) {
+      resetLayoutBtn.addEventListener('click', () => {
+        setLayout(70, 50);
+        layoutSlidersPopover.classList.remove('active');
+      });
+    }
+
+    // Close popover when clicking outside
+    document.addEventListener('click', (e) => {
+      if (layoutSlidersPopover && layoutSlidersPopover.classList.contains('active')) {
+        if (!layoutSlidersPopover.contains(e.target) && e.target !== openSlidersBtn) {
+          layoutSlidersPopover.classList.remove('active');
+        }
+      }
+    });
+
+    // Mouse Dragging on Splitters
+    let isDraggingH = false;
+    let isDraggingV = false;
+    let isDraggingBoth = false;
+
+    if (resizerH) {
+      resizerH.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDraggingH = true;
+        workspace.classList.add('is-resizing');
+        resizerH.classList.add('active');
+        showTooltip();
+      });
+    }
+
+    if (resizerV) {
+      resizerV.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDraggingV = true;
+        workspace.classList.add('is-resizing');
+        resizerV.classList.add('active');
+        showTooltip();
+      });
+    }
+
+    if (resizerCenter) {
+      resizerCenter.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDraggingBoth = true;
+        workspace.classList.add('is-resizing');
+        resizerCenter.classList.add('active');
+        showTooltip();
+      });
+    }
+
+    function showTooltip() {
+      if (!resizeTooltip) return;
+      resizeTooltip.style.display = 'block';
+      updateTooltipText();
+    }
+
+    function updateTooltipText() {
+      if (!resizeTooltip) return;
+      resizeTooltip.textContent = `Topp: ${currentTopPct}% | Bunn: ${100 - currentTopPct}% — Venstre: ${currentLeftPct}% | Høyre: ${100 - currentLeftPct}%`;
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDraggingH && !isDraggingV && !isDraggingBoth) return;
+
+      const rect = workspace.getBoundingClientRect();
+
+      if (isDraggingH || isDraggingBoth) {
+        const relY = e.clientY - rect.top;
+        const newTopPct = (relY / rect.height) * 100;
+        setLayout(newTopPct, currentLeftPct, false);
+      }
+
+      if (isDraggingV || isDraggingBoth) {
+        const relX = e.clientX - rect.left;
+        const newLeftPct = (relX / rect.width) * 100;
+        setLayout(currentTopPct, newLeftPct, false);
+      }
+
+      updateTooltipText();
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDraggingH || isDraggingV || isDraggingBoth) {
+        isDraggingH = false;
+        isDraggingV = false;
+        isDraggingBoth = false;
+        workspace.classList.remove('is-resizing');
+        if (resizerH) resizerH.classList.remove('active');
+        if (resizerV) resizerV.classList.remove('active');
+        if (resizerCenter) resizerCenter.classList.remove('active');
+        if (resizeTooltip) resizeTooltip.style.display = 'none';
+
+        // Persist on release
+        setLayout(currentTopPct, currentLeftPct, true);
+      }
+    });
+
+    // Event listeners for Buttons
+    document.getElementById('runCodeBtn').onclick = runCode;
+    document.getElementById('inlineRunBtn').onclick = runCode;
+    document.getElementById('validateTaskBtn').onclick = validateCurrentTask;
+    document.getElementById('nextTaskBtn').onclick = () => switchTask(currentTaskIdx + 1);
+    document.getElementById('prevTaskBtn').onclick = () => switchTask(currentTaskIdx - 1);
+    document.getElementById('clearTerminalBtn').onclick = () => { terminalLogs.innerHTML = ''; };
+    document.getElementById('refreshPreviewBtn').onclick = runCode;
+    document.getElementById('loadStarterCodeBtn').onclick = () => {
+      if (confirm("Vil du tilbakestille koden for denne oppgaven til startmalen?")) {
+        const t = TASKS[currentTaskIdx];
+        codeFiles.html = t.starters.html;
+        codeFiles.css = t.starters.css;
+        codeFiles.js = t.starters.js;
+        codeEditor.value = codeFiles[activeEditorTab];
+        updateLineNumbers();
+        runCode();
+      }
+    };
+    document.getElementById('formatCodeBtn').onclick = () => {
+      // Basic auto-indent
+      const lines = codeEditor.value.split('\n');
+      codeEditor.value = lines.map(l => l.trimEnd()).join('\n');
+      codeFiles[activeEditorTab] = codeEditor.value;
+      updateLineNumbers();
+    };
+
+    // Start on first task
+    switchTask(0);
+  </script>
+</body>
+</html>

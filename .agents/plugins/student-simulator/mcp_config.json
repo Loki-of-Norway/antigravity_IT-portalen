@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "student-simulator": {
+      "command": "node",
+      "args": ["c:/Users/theod/Desktop/Antigravity_Reverse-Engeneering/rea/antigravity_IT-portalen/mcp/simulator-server.js"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}

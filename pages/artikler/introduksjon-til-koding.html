@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Komplett innføring i koding for nybegynnere. Lær HTML, CSS, JavaScript, og test koden din i vårt interaktive 4-sektor IDE med Sokratisk AI-veileder.">
+  <title>Introduksjon til Koding - IT-portalen</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/png" href="/Images/Loki_Brukerstøtte.png">
+  <style>
+    /* Styling specific to Coding Course & Embedded IDE */
+    .ide-embed-wrapper {
+      margin: 2.5rem 0;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      background: #0f172a;
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .ide-embed-header {
+      background: #1e293b;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+
+    .ide-embed-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .ide-embed-title svg {
+      color: var(--primary-light);
+    }
+
+    .ide-embed-frame {
+      width: 100%;
+      height: 860px;
+      border: none;
+      display: block;
+    }
+
+    .code-pill {
+      display: inline-block;
+      background: #e2e8f0;
+      color: #0f172a;
+      font-family: monospace;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.88em;
+    }
+
+    /* Course Quiz Block */
+    .course-quiz-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .quiz-question-box {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .quiz-question-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .quiz-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .quiz-option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 0.92rem;
+    }
+
+    .quiz-option-label:hover {
+      background: var(--bg-main);
+      border-color: var(--primary-light);
+    }
+
+    .quiz-option-label.correct {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .quiz-option-label.incorrect {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #b91c1c;
+    }
+
+    .quiz-feedback-box {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      display: none;
+      text-align: center;
+    }
+
+    .learning-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="/index.html" class="logo">
+          <img src="/Images/Loki_Brukerstøtte.png" alt="Loki Brukerstøtte" class="logo-icon">
+          <span class="logo-text">IT-portalen</span>
+        </a>
+        
+        <nav class="nav-desktop">
+          <ul>
+            <li><a href="/index.html">Hjem</a></li>
+            <li><a href="/pages/kategorier/veiledninger.html">Læring</a></li>
+            <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+            <li><a href="/pages/tjenester/index.html">Support</a></li>
+            <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+            <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+            <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+            <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <a href="/pages/konvertering/login.html" class="btn btn-outline">Logg inn</a>
+          <a href="/pages/konvertering/registrer.html" class="btn btn-primary">Registrer</a>
+          <button class="menu-toggle" aria-label="Meny">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <nav class="nav-mobile">
+      <ul>
+        <li><a href="/index.html">Hjem</a></li>
+        <li><a href="/pages/kategorier/veiledninger.html">Læring & Kurs</a></li>
+        <li><a href="/pages/kategorier/ressurser.html">Ressurser</a></li>
+        <li><a href="/pages/tjenester/index.html">Support</a></li>
+        <li><a href="/pages/min-fremgang.html">Min Fremgang</a></li>
+        <li><a href="/pages/kategorier/nyheter.html">Nyheter</a></li>
+        <li><a href="/pages/undersider/om-oss.html">Om oss</a></li>
+        <li><a href="/pages/konvertering/kontakt.html">Kontakt</a></li>
+        <li><a href="/pages/konvertering/login.html">Logg inn</a></li>
+        <li><a href="/pages/konvertering/registrer.html">Registrer</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/index.html">Hjem</a>
+        <span>/</span>
+        <a href="/pages/kategorier/veiledninger.html">Kurs & Veiledninger</a>
+        <span>/</span>
+        <span>Introduksjon til Koding</span>
+      </div>
+      <h1>Introduksjon til Koding 💻</h1>
+      <p style="color: var(--text-gray); margin-top: 0.5rem; font-size: 1.1rem;">
+        Lær det grunnleggende om HTML, CSS, JavaScript og systematisk feilsøking i et interaktivt 4-sektor IDE.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="page-content">
+    <div class="container">
+
+      <!-- Course Intro Banner -->
+      <div class="content-card">
+        <h2>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+          Hva er koding og webutvikling?
+        </h2>
+        <p>
+          En nettside er bygget opp av tre sentrale byggeklosser som jobber sømløst sammen. For å mestre IT-drift og brukerstøtte er det uvurderlig å forstå hvordan disse teknologiene fungerer:
+        </p>
+        
+        <div class="learning-grid-3">
+          <div style="background: var(--bg-main); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid #e44d26;">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.4rem; color: #e44d26;">1. HTML (Skjelettet)</h3>
+            <p style="font-size: 0.9rem;">
+              HTML gir innhold og struktur: overskrifter, avsnitt, lister, knapper og lenker. Uten HTML har du ingenting å vise.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-main); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid #2563eb;">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.4rem; color: #2563eb;">2. CSS (Klærne & Stilen)</h3>
+            <p style="font-size: 0.9rem;">
+              CSS styrer farger, fonter, avstander og layout. Med boksmodellen og Flexbox plasserer vi elementene der vi vil ha dem.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-main); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid #f59e0b;">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.4rem; color: #d97706;">3. JavaScript (Hjernen)</h3>
+            <p style="font-size: 0.9rem;">
+              JavaScript gjør siden interaktiv. Det lytter på klikk, oppdaterer innhold i sanntid og kommuniserer med databaser og servere.
+            </p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <p>
+            <strong>Tips:</strong> Nedenfor finner du vårt skreddersydde <strong>4-sektor IDE</strong>. Der kan du løse 10 praktiske kodingsoppgaver steg for steg. Har du spørsmål, trykker du på <strong>🦉 Spør Loki</strong> for å få sokratisk hjelp!
+          </p>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           EMBEDDED 4-SECTOR IDE IFRAME SECTION
+           ======================================================== -->
+      <section id="ideSection">
+        <div class="ide-embed-wrapper">
+          <div class="ide-embed-header">
+            <div class="ide-embed-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              <span>Loki Koding IDE - 4 Sektorer (Oppgaver, Editor, Live Preview & Terminal)</span>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="/pages/undersider/koding-ide.html" target="_blank" class="btn btn-sm btn-outline" style="color: #fff; border-color: #475569; font-size: 0.8rem;">
+                ⤢ Åpne i fullskjerm
+              </a>
+            </div>
+          </div>
+
+          <!-- The 4-Sector IDE embedded in iframe -->
+          <iframe src="/pages/undersider/koding-ide.html" class="ide-embed-frame" id="embeddedIdeFrame" title="Loki Koding IDE"></iframe>
+        </div>
+      </section>
+
+      <!-- Teori Sammendrag & Feilsøking -->
+      <div class="content-card mt-xl">
+        <h2>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 17 10 11 4 5"/>
+            <line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          Systematisk Feilsøking i Utvikling & IT-support
+        </h2>
+        <p>
+          I Sektor 4 i IDE-et har du tilgang til en terminal. Når koden ikke oppfører seg som forventet, bruker vi disse prinsippene:
+        </p>
+        <ul style="padding-left: 1.5rem; line-height: 1.8; margin-top: 0.5rem; color: var(--text-gray);">
+          <li><strong>Les feilmeldingen nøye:</strong> Feilmeldinger som <span class="code-pill">SyntaxError</span> eller <span class="code-pill">ReferenceError</span> peker ofte direkte på linjenummeret der feilen oppstod.</li>
+          <li><strong>Bruk console.log():</strong> Skriv ut verdiene til variabler for å se hva datamaskinen faktisk ser i sanntid.</li>
+          <li><strong>Sjekk åpne og lukkede tagger:</strong> En av de vanligste feilene for nybegynnere er en manglende <span class="code-pill">&lt;/tagg&gt;</span> eller en glemt hermetegn <span class="code-pill">"</span>.</li>
+          <li><strong>Tenk sokratisk:</strong> Spør deg selv: <em>"Hva var forventet oppførsel, og hva skjedde i stedet?"</em></li>
+        </ul>
+      </div>
+
+      <!-- ========================================================
+           KURS-QUIZ: 10 SPØRSMÅL
+           ======================================================== -->
+      <section class="course-quiz-card" id="teoriQuiz">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.4rem; color: var(--text-dark);">🧠 Kunnskapstest: 10 Spørsmål</h2>
+            <p style="color: var(--text-gray); font-size: 0.95rem;">Test hva du har lært om HTML, CSS, JavaScript og terminalfeilsøking.</p>
+          </div>
+          <span style="font-size: 0.85rem; font-weight: 600; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 999px;">
+            10 Spørsmål
+          </span>
+        </div>
+
+        <form id="codingQuizForm">
+          <!-- Dynamically populated or statically rendered questions -->
+          <div id="quizContainer"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+            <span id="quizStatusIndicator" style="font-weight: 600; color: var(--text-gray); font-size: 0.95rem;">Svar på alle 10 spørsmålene</span>
+            <button type="button" id="submitQuizBtn" class="btn btn-primary">
+              Fullfør & Send inn svar
+            </button>
+          </div>
+        </form>
+
+        <div class="quiz-feedback-box" id="quizFeedbackBox">
+          <h3 id="quizFeedbackTitle" style="font-size: 1.3rem; margin-bottom: 0.5rem;">Resultat</h3>
+          <p id="quizFeedbackText" style="color: var(--text-gray); font-size: 1rem; line-height: 1.5;"></p>
+          <div style="margin-top: 1.25rem; display: flex; justify-content: center; gap: 1rem;">
+            <a href="/pages/min-fremgang.html" class="btn btn-primary">Gå til Min Fremgang</a>
+            <button type="button" id="retryQuizBtn" class="btn btn-outline">Ta testen på nytt</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <p>Theodor "Loki" Kvalem © 2026 IT-portalen. Utviklet for elever og personer med behov for IT-støtte.</p>
+        <a href="/pages/artikler/personvernerklaering.html" style="color: var(--text-muted); font-size: 0.875rem;">Personvernerklæring</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script>
+    /* ========================================================
+       10 Multiple-Choice Questions for Theory Quiz
+       ======================================================== */
+    const QUIZ_QUESTIONS = [
+      {
+        id: 1,
+        question: "1. Hva står HTML for?",
+        options: [
+          { text: "HyperText Markup Language", correct: true },
+          { text: "HighTech Modern Language", correct: false },
+          { text: "Hyperlink and Text Model Line", correct: false },
+          { text: "Home Tool Markup Language", correct: false }
+        ]
+      },
+      {
+        id: 2,
+        question: "2. Hvilken HTML-tagg brukes for den viktigste hovedoverskriften på en side?",
+        options: [
+          { text: "<h6>", correct: false },
+          { text: "<head>", correct: false },
+          { text: "<h1>", correct: true },
+          { text: "<header>", correct: false }
+        ]
+      },
+      {
+        id: 3,
+        question: "3. Hvilket attributt må anker-taggen <a> ha for å peke til en nettadresse?",
+        options: [
+          { text: "src=\"...\"", correct: false },
+          { text: "href=\"...\"", correct: true },
+          { text: "link=\"...\"", correct: false },
+          { text: "target_url=\"...\"", correct: false }
+        ]
+      },
+      {
+        id: 4,
+        question: "4. Hva er forskjellen mellom <ul> og <ol> i HTML?",
+        options: [
+          { text: "<ul> lager uordnede punktlister (kulepunkter), mens <ol> lager nummererte lister", correct: true },
+          { text: "<ol> kan kun inneholde tekst, <ul> kan kun inneholde bilder", correct: false },
+          { text: "Det er ingen forskjell, de er synonymer", correct: false },
+          { text: "<ul> brukes kun i navigasjonsmenyer", correct: false }
+        ]
+      },
+      {
+        id: 5,
+        question: "5. Hvilken CSS-egenskap brukes for å endre fargen på teksten i et element?",
+        options: [
+          { text: "text-color", correct: false },
+          { text: "font-color", correct: false },
+          { text: "color", correct: true },
+          { text: "text-style", correct: false }
+        ]
+      },
+      {
+        id: 6,
+        question: "6. Hva er 'padding' i CSS boksmodellen?",
+        options: [
+          { text: "Avstanden fra elementets ramme og utover til naboelementer", correct: false },
+          { text: "Luft/avstand på innsiden av elementets ramme rundt innholdet", correct: true },
+          { text: "Tykkelsen på rammen (border)", correct: false },
+          { text: "Elementets gjennomsiktighet", correct: false }
+        ]
+      },
+      {
+        id: 7,
+        question: "7. Hva oppnår du med regelen 'display: flex;' i CSS?",
+        options: [
+          { text: "Gjør elementet usynlig", correct: false },
+          { text: "Aktiverer en fleksibel layoutmodell som gjør det enkelt å plassere og fordele barneelementer", correct: true },
+          { text: "Lager en 3D-rotasjon av teksten", correct: false },
+          { text: "Tvinger alle bilder til å bli firkantede", correct: false }
+        ]
+      },
+      {
+        id: 8,
+        question: "8. Hva er JavaScript sin primære rolle i en moderne nettleser?",
+        options: [
+          { text: "Å definere opphavsrett for nettsiden", correct: false },
+          { text: "Å style farger og skygger på knapper", correct: false },
+          { text: "Å gi logikk, interaktivitet, hendelseshåndtering og dynamisk innhold", correct: true },
+          { text: "Å formatere tabeller til utskrift", correct: false }
+        ]
+      },
+      {
+        id: 9,
+        question: "9. Hvordan henter man et element med en bestemt ID i JavaScript?",
+        options: [
+          { text: "document.getElementById('idNavn')", correct: true },
+          { text: "window.findTag('idNavn')", correct: false },
+          { text: "document.select('#idNavn')", correct: false },
+          { text: "HTML.getElement('idNavn')", correct: false }
+        ]
+      },
+      {
+        id: 10,
+        question: "10. Hvilken metode brukes for å skrive ut feilsøkingsmeldinger til terminalen/konsollen?",
+        options: [
+          { text: "print.screen()", correct: false },
+          { text: "terminal.write()", correct: false },
+          { text: "console.log()", correct: true },
+          { text: "alert.terminal()", correct: false }
+        ]
+      }
+    ];
+
+    const quizContainer = document.getElementById('quizContainer');
+    const submitQuizBtn = document.getElementById('submitQuizBtn');
+    const quizFeedbackBox = document.getElementById('quizFeedbackBox');
+    const quizFeedbackTitle = document.getElementById('quizFeedbackTitle');
+    const quizFeedbackText = document.getElementById('quizFeedbackText');
+    const retryQuizBtn = document.getElementById('retryQuizBtn');
+
+    function renderQuiz() {
+      quizContainer.innerHTML = '';
+      QUIZ_QUESTIONS.forEach((q, qIndex) => {
+        const qBox = document.createElement('div');
+        qBox.className = 'quiz-question-box';
+        
+        const title = document.createElement('h3');
+        title.className = 'quiz-question-title';
+        title.textContent = q.question;
+        qBox.appendChild(title);
+
+        const optsList = document.createElement('div');
+        optsList.className = 'quiz-options-list';
+
+        q.options.forEach((opt, oIndex) => {
+          const label = document.createElement('label');
+          label.className = 'quiz-option-label';
+
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = `question_${qIndex}`;
+          radio.value = oIndex;
+          radio.required = true;
+
+          const textSpan = document.createElement('span');
+          textSpan.textContent = opt.text;
+
+          label.appendChild(radio);
+          label.appendChild(textSpan);
+          optsList.appendChild(label);
+        });
+
+        qBox.appendChild(optsList);
+        quizContainer.appendChild(qBox);
+      });
+    }
+
+    submitQuizBtn.addEventListener('click', () => {
+      let score = 0;
+      let allAnswered = true;
+
+      QUIZ_QUESTIONS.forEach((q, qIndex) => {
+        const selected = document.querySelector(`input[name="question_${qIndex}"]:checked`);
+        if (!selected) {
+          allAnswered = false;
+          return;
+        }
+
+        const selectedIndex = parseInt(selected.value);
+        const optionsLabels = document.querySelectorAll(`input[name="question_${qIndex}"]`);
+
+        optionsLabels.forEach((input, idx) => {
+          const parent = input.parentElement;
+          if (q.options[idx].correct) {
+            parent.classList.add('correct');
+          } else if (idx === selectedIndex) {
+            parent.classList.add('incorrect');
+          }
+        });
+
+        if (q.options[selectedIndex].correct) {
+          score++;
+        }
+      });
+
+      if (!allAnswered) {
+        alert("Vennligst besvar alle 10 spørsmålene før du leverer!");
+        return;
+      }
+
+      // Show feedback
+      quizFeedbackBox.style.display = 'block';
+      const percentage = Math.round((score / 10) * 100);
+
+      if (score >= 8) {
+        quizFeedbackBox.style.background = '#dcfce7';
+        quizFeedbackBox.style.border = '1px solid #22c55e';
+        quizFeedbackTitle.style.color = '#15803d';
+        quizFeedbackTitle.textContent = `🎉 Strålende! Du fikk ${score} av 10 riktig (${percentage}%)`;
+        quizFeedbackText.textContent = "Du har en solid forståelse for webutvikling, HTML-struktur, CSS-stiling og feilsøking!";
+      } else if (score >= 5) {
+        quizFeedbackBox.style.background = '#fef3c7';
+        quizFeedbackBox.style.border = '1px solid #f59e0b';
+        quizFeedbackTitle.style.color = '#b45309';
+        quizFeedbackTitle.textContent = `👍 Godt forsøk! Du fikk ${score} av 10 riktig (${percentage}%)`;
+        quizFeedbackText.textContent = "Du er godt på vei! Les gjennom veiledningen og test koden en gang til i IDE-et for å tette hullene.";
+      } else {
+        quizFeedbackBox.style.background = '#fee2e2';
+        quizFeedbackBox.style.border = '1px solid #ef4444';
+        quizFeedbackTitle.style.color = '#b91c1c';
+        quizFeedbackTitle.textContent = `💪 Du fikk ${score} av 10 riktig (${percentage}%)`;
+        quizFeedbackText.textContent = "Bruk IDE-et ovenfor for å eksperimentere med oppgavene, så prøver du testen på nytt!";
+      }
+
+      // Save to backend database API
+      fetch('/api/progress/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseSlug: 'intro-coding',
+          score: score,
+          totalQuestions: 10
+        })
+      }).then(r => r.json()).then(data => {
+        if (data.success) {
+          console.log("Quiz-resultat lagret i IT-portalen databasen!");
+        }
+      }).catch(err => console.error("Kunne ikke lagre quiz:", err));
+
+      if (score >= 7) {
+        fetch('/api/progress/course', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            courseSlug: 'intro-coding',
+            isCompleted: true
+          })
+        }).catch(e => console.error(e));
+      }
+
+      quizFeedbackBox.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    retryQuizBtn.addEventListener('click', () => {
+      quizFeedbackBox.style.display = 'none';
+      renderQuiz();
+      document.getElementById('teoriQuiz').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Render Quiz on Page Load
+    renderQuiz();
+  </script>
+</body>
+</html>

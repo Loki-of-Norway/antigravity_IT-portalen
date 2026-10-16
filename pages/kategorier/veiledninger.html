@@ -197,19 +197,21 @@
             <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
           </span>
         </div>
-        <div class="card">
-          <div class="card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="16 18 22 12 16 6"/>
-              <polyline points="8 6 2 12 8 18"/>
-            </svg>
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <h3>Introduksjon til koding</h3>
+            <p>Grunnleggende programmering med HTML, CSS, JavaScript og et interaktivt 4-sektor IDE med Sokratisk AI-veileder.</p>
           </div>
-          <h3>Introduksjon til koding</h3>
-          <p>Grunnleggende programmering med HTML, CSS og JavaScript.</p>
-          <span class="card-link" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>Start kurs</span>
-            <button class="btn btn-sm btn-outline" onclick="alert('Quiz kommer snart!')">Start Quiz</button>
-          </span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <a href="/pages/artikler/introduksjon-til-koding.html" class="card-link" style="font-weight: 600;">Gå til kurset &rarr;</a>
+            <a href="/pages/undersider/koding-ide.html" class="btn btn-sm btn-primary" target="_blank">Start IDE</a>
+          </div>
         </div>
         <div class="card">
           <div class="card-icon">
@@ -433,6 +435,108 @@
                         { text: "Det er ikke viktig, du kan bare dra ut kontakten", correct: false },
                         { text: "For å la PC-en lagre filer og lukke programmer riktig før den stopper", correct: true },
                         { text: "For at PC-en skal bli raskere neste gang du starter den", correct: false }
+                    ]
+                }
+            ]
+        },
+        'intro-coding': {
+            title: "Introduksjon til koding",
+            guide: `
+                <h3>Velkommen til Introduksjon til koding!</h3>
+                <p>Koding handler om å gi instruksjoner til en datamaskin for å bygge nettsider, systemer og verktøy.</p>
+                
+                <h4>De tre pilarene i web:</h4>
+                <ul>
+                    <li><strong>HTML:</strong> Byggeklossene og strukturen (overskrifter, tekst, lenker, knapper).</li>
+                    <li><strong>CSS:</strong> Utseende, farger, rammer, padding og fleksible oppsett (Flexbox).</li>
+                    <li><strong>JavaScript:</strong> Logikk, dynamisk innhold og reaksjon på brukerhandlinger.</li>
+                </ul>
+
+                <p>Vi har laget et eget <strong>interaktivt 4-sektor IDE</strong> hvor du kan løse 10 praktiske kodingsoppgaver med direkte forhåndsvisning og terminalfeilsøking!</p>
+                <div style="margin: 1.5rem 0;">
+                    <a href="/pages/artikler/introduksjon-til-koding.html" class="btn btn-primary">Gå til kurssiden med IDE &rarr;</a>
+                    <a href="/pages/undersider/koding-ide.html" target="_blank" class="btn btn-outline" style="margin-left: 0.5rem;">Åpne IDE direkte</a>
+                </div>
+            `,
+            quiz: [
+                {
+                    question: "Hva står HTML for?",
+                    options: [
+                        { text: "HyperText Markup Language", correct: true },
+                        { text: "HighTech Modern Language", correct: false },
+                        { text: "Home Tool Markup Language", correct: false }
+                    ]
+                },
+                {
+                    question: "Hvilken tagg brukes for den viktigste hovedoverskriften i HTML?",
+                    options: [
+                        { text: "<h6>", correct: false },
+                        { text: "<h1>", correct: true },
+                        { text: "<header>", correct: false }
+                    ]
+                },
+                {
+                    question: "Hvilket attributt i taggen <a> spesifiserer hvor en lenke skal peke?",
+                    options: [
+                        { text: "src", correct: false },
+                        { text: "href", correct: true },
+                        { text: "link", correct: false }
+                    ]
+                },
+                {
+                    question: "Hva brukes <ul> og <li> til i HTML?",
+                    options: [
+                        { text: "Å lage uordnede punktlister med listepunkter", correct: true },
+                        { text: "Å laste inn bilder", correct: false },
+                        { text: "Å kjøre JavaScript", correct: false }
+                    ]
+                },
+                {
+                    question: "Hvilken CSS-egenskap brukes for å endre fargen på en tekst?",
+                    options: [
+                        { text: "font-style", correct: false },
+                        { text: "color", correct: true },
+                        { text: "text-color", correct: false }
+                    ]
+                },
+                {
+                    question: "Hva er 'padding' i boksmodellen?",
+                    options: [
+                        { text: "Luft/avstand på innsiden av elementets ramme", correct: true },
+                        { text: "Avstand ut til andre elementer", correct: false },
+                        { text: "Høyden på en knapp", correct: false }
+                    ]
+                },
+                {
+                    question: "Hva gjør CSS-regelen 'display: flex;'?",
+                    options: [
+                        { text: "Skjuler elementet helt", correct: false },
+                        { text: "Gjør elementet til en fleksibel container som kan sentrere og fordele barna sine", correct: true },
+                        { text: "Endrer skrifttypen til kursiv", correct: false }
+                    ]
+                },
+                {
+                    question: "Hva er JavaScript sin primære oppgave på en nettside?",
+                    options: [
+                        { text: "Gi siden interaktivitet, dynamikk og hendelseshåndtering", correct: true },
+                        { text: "Lagre domenenavnet i DNS", correct: false },
+                        { text: "Definere skrifttyper", correct: false }
+                    ]
+                },
+                {
+                    question: "Hvordan finner man et element med en ID i JavaScript?",
+                    options: [
+                        { text: "document.getElementById('minId')", correct: true },
+                        { text: "window.find('minId')", correct: false },
+                        { text: "DOM.select('minId')", correct: false }
+                    ]
+                },
+                {
+                    question: "Hvilken funksjon brukes til å skrive feilsøkingsmeldinger til terminalen/konsollen?",
+                    options: [
+                        { text: "print()", correct: false },
+                        { text: "console.log()", correct: true },
+                        { text: "terminal.write()", correct: false }
                     ]
                 }
             ]

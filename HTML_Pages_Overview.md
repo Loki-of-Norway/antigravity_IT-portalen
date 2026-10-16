@@ -28,6 +28,8 @@ This document provides a comprehensive list of all `.html` pages within the IT-p
     - *Description:* Provides a systematic approach to troubleshooting technical hardware, software, and network issues.
 - **[intelligente-systemer.html](file:///c:/Users/TheodorKvalem/OneDrive%20-%20Krokeide%20Videreg%C3%A5ende%20Skole/Skrivebord/antigravity_IT-portalen/pages/artikler/intelligente-systemer.html)**
     - *Description:* Explores AI and machine learning's role in IT support and automation.
+- **[introduksjon-til-koding.html](file:///c:/Users/TheodorKvalem/OneDrive%20-%20Krokeide%20Videreg%C3%A5ende%20Skole/Skrivebord/antigravity_IT-portalen/pages/artikler/introduksjon-til-koding.html)**
+    - *Description:* Introduksjon til koding med teori (HTML, CSS, JS, feilsøking), 10-spørsmåls quiz og innebygd 4-sektor IDE med Sokratisk Loki-assistent.
 - **[kommunikasjon.html](file:///c:/Users/TheodorKvalem/OneDrive%20-%20Krokeide%20Videreg%C3%A5ende%20Skole/Skrivebord/antigravity_IT-portalen/pages/artikler/kommunikasjon.html)**
     - *Description:* Emphasizes effective communication, active listening, and professionalism in a support context.
 - **[konflikthandtering.html](file:///c:/Users/TheodorKvalem/OneDrive%20-%20Krokeide%20Videreg%C3%A5ende%20Skole/Skrivebord/antigravity_IT-portalen/pages/artikler/konflikthandtering.html)**
@@ -74,5 +76,7 @@ This document provides a comprehensive list of all `.html` pages within the IT-p
 ## Subpages (`pages/undersider/`)
 - **[faq.html](file:///c:/Users/TheodorKvalem/OneDrive%20-%20Krokeide%20Videreg%C3%A5ende%20Skole/Skrivebord/antigravity_IT-portalen/pages/undersider/faq.html)**
     - *Description:* Detailed list of frequently asked questions and answers for common IT problems.
+- **[koding-ide.html](file:///c:/Users/TheodorKvalem/OneDrive%20-%20Krokeide%20Videreg%C3%A5ende%20Skole/Skrivebord/antigravity_IT-portalen/pages/undersider/koding-ide.html)**
+    - *Description:* Interaktivt 4-sektor utviklermiljø (IDE) for kodeoppgaver, kode-editor, live preview og terminal, med Sokratisk AI-veileder (Loki).
 - **[om-oss.html](file:///c:/Users/TheodorKvalem/OneDrive%20-%20Krokeide%20Videreg%C3%A5ende%20Skole/Skrivebord/antigravity_IT-portalen/pages/undersider/om-oss.html)**
     - *Description:* Information about the purpose, vision, and team behind the IT-portalen platform.

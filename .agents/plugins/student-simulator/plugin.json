@@ -1,0 +1,4 @@
+{
+  "name": "student-simulator",
+  "description": "MCP-server for å generere test-elever, tilfeldige/realistiske oppgavebesvarelser, quizer og tickets for testing av IT-portalen."
+}

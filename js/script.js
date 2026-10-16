@@ -205,11 +205,7 @@ function initChatbot() {
 
   // State
   let isAiMode = false; // Default to Guided Mode (since toggle is "Unchecked" = Guided usually, but let's check HTML)
-  // HTML: <input type="checkbox" id="decisionTreeToggle" checked> -> Checked = ? 
-  // Label says: "AI-Assistent" [Switch] "Veiledet"
-  // If checked (right side/slider moved) -> Veiledet? Or AI?
-  // Let's interpret: Left (unchecked) = AI, Right (checked) = Guided.
-  // We'll update state on load.
+  let sessionChatHistory = []; // Conversational history for Gemini 3.6 Flash
 
   // Decision Tree Data
   const decisionTree = {
@@ -345,9 +341,10 @@ function initChatbot() {
           
           // Clear chat or show welcome based on mode
           chatMessages.innerHTML = '';
+          sessionChatHistory = [];
           
           if (isAiMode) {
-              addMessage("Hei! Jeg er din AI-assistent (drevet av Gemini). Fortell meg hva du trenger, så finner jeg riktig sted for deg!", false);
+              addMessage("Hei! Jeg er din AI-assistent (drevet av Gemini 3.6 Flash). Fortell meg hva du lurer på, så hjelper jeg deg med en gang!", false);
           } else {
               // Start Guided Tour
               displayNode('ROOT');
@@ -499,7 +496,7 @@ function initChatbot() {
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: message, mode: mode }) 
+      body: JSON.stringify({ message: message, mode: mode, chatHistory: sessionChatHistory }) 
     })
     .then(res => res.json())
     .then(data => {
@@ -511,17 +508,17 @@ function initChatbot() {
               const intent = data.intent; // e.g., "LEARNING_GRUNNLEGGENDE" or "UNKNOWN"
               if (intent && decisionTree[intent]) {
                   // Success: Jump to node
-                  // Maybe add a small text first?
-                  // addMessage("Jeg fant dette for deg:", false);
                   displayNode(intent);
               } else {
                   // Fallback: No matching node found
-                  addMessage("Beklager, jeg fant ingen relevant kategori i menyen. Prøv å bruke knappene eller formuler deg annerledes.", false);
+                  addMessage("Beklager, jeg fant ingen relevant kategori i menyen. Prøv å velge fra alternativene eller formuler spørsmålet annerledes.", false);
               }
           } else {
               // Free Chat
-              // Expect 'response' text
               addMessage(data.response, false); 
+              // Store history for Gemini 3.6 Flash
+              sessionChatHistory.push({ role: 'user', parts: [{ text: message }] });
+              sessionChatHistory.push({ role: 'model', parts: [{ text: data.response }] });
           }
       } else {
         addMessage('Beklager, en serverfeil oppstod.', false);

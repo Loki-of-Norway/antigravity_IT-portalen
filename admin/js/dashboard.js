@@ -92,6 +92,12 @@ function loadViewData(view) {
         case 'overview':
             loadOverviewStats();
             break;
+        case 'teacher':
+            loadTeacherOverview();
+            break;
+        case 'tickets':
+            loadTickets();
+            break;
         case 'users':
             loadUsers();
             break;
@@ -427,3 +433,423 @@ function loadFAQs() {
             }
         });
 }
+
+/* ========================================================
+   Teacher Overview & MCP Simulator Logic
+   ======================================================== */
+
+window.teacherStudentsData = [];
+let teacherCourseChartInstance = null;
+let teacherDistributionChartInstance = null;
+
+/**
+ * Load complete Teacher Overview
+ */
+window.loadTeacherOverview = function() {
+    loadTeacherStats();
+    loadTeacherStudents();
+    loadTeacherCourses();
+    loadSimulatorSummary();
+};
+
+/**
+ * Fetch and display Teacher KPIs
+ */
+function loadTeacherStats() {
+    fetch('/api/admin/teacher/stats')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('teacher-stat-students').innerText = data.stats.totalStudents;
+                document.getElementById('teacher-stat-avg-score').innerText = (data.stats.avgClassScore || 0) + '%';
+                document.getElementById('teacher-stat-completed').innerText = data.stats.totalCompleted;
+                document.getElementById('teacher-stat-at-risk').innerText = data.stats.atRiskStudents;
+            }
+        })
+        .catch(err => console.error('Feil ved henting av lærer-stats:', err));
+}
+
+/**
+ * Fetch and list students with progress
+ */
+function loadTeacherStudents() {
+    fetch('/api/admin/teacher/students')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.teacherStudentsData = data.students;
+                renderTeacherStudents(window.teacherStudentsData);
+                // Refresh distribution chart once student data is in
+                if (window.lastCoursesData) {
+                    renderTeacherCharts(window.lastCoursesData);
+                }
+            }
+        })
+        .catch(err => console.error('Feil ved henting av elever:', err));
+}
+
+/**
+ * Render student list into table
+ */
+function renderTeacherStudents(students) {
+    const tbody = document.getElementById('teacher-students-table-body');
+    if (!students || students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-gray); padding: 2rem;">Ingen elever funnet. Klikk "🎲 Generer 8 testelever & svar" ovenfor for å opprette testelever!</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = students.map(s => {
+        const avg = s.avg_score_pct !== null ? Number(s.avg_score_pct) : 0;
+        let statusBadge = '<span class="badge badge-info">Ikke startet</span>';
+        let barColor = '#94a3b8';
+
+        if (s.total_quiz_attempts > 0) {
+            if (avg >= 70) {
+                statusBadge = '<span class="badge badge-success">Bestått (A/B)</span>';
+                barColor = '#10b981';
+            } else if (avg >= 50) {
+                statusBadge = '<span class="badge badge-warning">Middels (C/D)</span>';
+                barColor = '#f59e0b';
+            } else {
+                statusBadge = '<span class="badge badge-danger">Trenger oppfølging</span>';
+                barColor = '#ef4444';
+            }
+        }
+
+        const lastActive = s.last_attempt_at ? new Date(s.last_attempt_at).toLocaleDateString() : 'Aldri';
+
+        return `
+            <tr>
+                <td><strong>${s.username}</strong></td>
+                <td><small style="color:var(--text-gray);">${s.email}</small></td>
+                <td><span style="font-weight:600;">${s.completed_courses}</span> kurs</td>
+                <td>${s.total_quiz_attempts} forsøk</td>
+                <td>
+                    <div class="score-progress">
+                        <span style="min-width: 42px; font-weight:600;">${s.total_quiz_attempts > 0 ? avg + '%' : '-'}</span>
+                        <div class="score-bar-bg">
+                            <div class="score-bar-fill" style="width: ${Math.min(100, avg)}%; background-color: ${barColor};"></div>
+                        </div>
+                    </div>
+                </td>
+                <td>${statusBadge}</td>
+                <td>${lastActive}</td>
+                <td>
+                    <button class="btn btn-outline btn-sm" onclick="openStudentModal(${s.id})">
+                        🔍 Se svar
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/**
+ * Filter students in UI
+ */
+window.filterTeacherStudents = function() {
+    const search = (document.getElementById('teacherSearchInput').value || '').toLowerCase();
+    const filter = document.getElementById('teacherFilterSelect').value;
+
+    const filtered = window.teacherStudentsData.filter(s => {
+        const matchesSearch = s.username.toLowerCase().includes(search) || s.email.toLowerCase().includes(search);
+        const avg = s.avg_score_pct !== null ? Number(s.avg_score_pct) : 0;
+
+        let matchesFilter = true;
+        if (filter === 'passed') {
+            matchesFilter = s.total_quiz_attempts > 0 && avg >= 70;
+        } else if (filter === 'risk') {
+            matchesFilter = s.total_quiz_attempts > 0 && avg < 50;
+        }
+
+        return matchesSearch && matchesFilter;
+    });
+
+    renderTeacherStudents(filtered);
+};
+
+/**
+ * Load course statistics and render teacher charts
+ */
+function loadTeacherCourses() {
+    fetch('/api/admin/teacher/courses')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.courses) {
+                window.lastCoursesData = data.courses;
+                renderTeacherCharts(data.courses);
+            }
+        })
+        .catch(err => console.error('Feil ved henting av kurs-statistikk:', err));
+}
+
+function renderTeacherCharts(courses) {
+    // 1. Average score per course chart
+    const courseCanvas = document.getElementById('teacherCourseChart');
+    if (courseCanvas) {
+        if (teacherCourseChartInstance) teacherCourseChartInstance.destroy();
+
+        const labels = courses.map(c => c.course_slug);
+        const avgScores = courses.map(c => c.avg_score_pct);
+
+        teacherCourseChartInstance = new Chart(courseCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels.length > 0 ? labels : ['Ingen kursdata'],
+                datasets: [
+                    {
+                        label: 'Gjennomsnittlig score (%)',
+                        data: avgScores.length > 0 ? avgScores : [0],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, max: 100 }
+                }
+            }
+        });
+    }
+
+    // 2. Class grade distribution chart
+    const distCanvas = document.getElementById('teacherDistributionChart');
+    if (distCanvas) {
+        if (teacherDistributionChartInstance) teacherDistributionChartInstance.destroy();
+
+        let countHigh = 0; // >= 70%
+        let countMed = 0;  // 50-69%
+        let countLow = 0;  // < 50%
+        let countUnstarted = 0;
+
+        (window.teacherStudentsData || []).forEach(s => {
+            if (s.total_quiz_attempts === 0) {
+                countUnstarted++;
+            } else {
+                const avg = Number(s.avg_score_pct || 0);
+                if (avg >= 70) countHigh++;
+                else if (avg >= 50) countMed++;
+                else countLow++;
+            }
+        });
+
+        teacherDistributionChartInstance = new Chart(distCanvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Bestått (70-100%)', 'Middels (50-69%)', 'Trenger hjelp (<50%)', 'Ikke startet'],
+                datasets: [{
+                    data: [countHigh, countMed, countLow, countUnstarted],
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#94a3b8'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+}
+
+/**
+ * Load simulator status pill
+ */
+function loadSimulatorSummary() {
+    fetch('/api/admin/simulator/summary')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const pill = document.getElementById('simStatusPill');
+                if (pill) {
+                    pill.innerHTML = `🤖 <strong>${data.summary.testStudents}</strong> testelever (${data.summary.totalQuizSubmissions} svar)`;
+                }
+            }
+        })
+        .catch(err => console.error(err));
+}
+
+/**
+ * Trigger MCP / API Simulation
+ */
+window.runSimulation = function() {
+    const btn = document.getElementById('btnRunSimulation');
+    btn.disabled = true;
+    btn.innerText = '⏳ Kjører simulering...';
+
+    fetch('/api/admin/simulator/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentCount: 8, responseMode: 'realistic', attemptsPerStudent: 3 })
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerText = '🎲 Generer 8 testelever & svar';
+        if (data.success) {
+            alert(data.message || 'Simulering fullført!');
+            loadTeacherOverview();
+            loadOverviewStats();
+        } else {
+            alert('Feil under simulering: ' + (data.message || 'Ukjent feil'));
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btn.innerText = '🎲 Generer 8 testelever & svar';
+        alert('Nettverksfeil: ' + err.message);
+    });
+};
+
+/**
+ * Clear simulated test data
+ */
+window.clearSimulation = function() {
+    if (!confirm('Er du sikker på at du vil slette alle genererte testelever og tilhørende oppgaveresultater?')) return;
+
+    const btn = document.getElementById('btnClearSimulation');
+    btn.disabled = true;
+    btn.innerText = '⏳ Sletter...';
+
+    fetch('/api/admin/simulator/clear', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerText = '🧹 Nullstill testdata';
+            if (data.success) {
+                alert(data.message);
+                loadTeacherOverview();
+                loadOverviewStats();
+            } else {
+                alert('Feil: ' + data.message);
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerText = '🧹 Nullstill testdata';
+            alert('Feil: ' + err.message);
+        });
+};
+
+/**
+ * Open Student Detail Modal
+ */
+window.openStudentModal = function(studentId) {
+    const modal = document.getElementById('studentModal');
+    modal.style.display = 'flex';
+    document.getElementById('modalQuizHistoryBody').innerHTML = '<tr><td colspan="4" style="text-align:center;">Laster besvarelser...</td></tr>';
+
+    fetch(`/api/admin/teacher/student/${studentId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('modalStudentName').innerText = data.student.username;
+                document.getElementById('modalStudentEmail').innerText = data.student.email;
+
+                const completedCount = data.courses.filter(c => c.is_completed).length;
+                document.getElementById('modalStudentCourses').innerText = completedCount;
+                document.getElementById('modalStudentAttempts').innerText = data.quizHistory.length;
+
+                const totalPct = data.quizHistory.reduce((acc, q) => acc + (q.score / q.total_questions * 100), 0);
+                const avgPct = data.quizHistory.length > 0 ? Math.round(totalPct / data.quizHistory.length) : 0;
+                document.getElementById('modalStudentAvg').innerText = avgPct + '%';
+
+                const tbody = document.getElementById('modalQuizHistoryBody');
+                if (data.quizHistory.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-gray);">Ingen quizer levert enda.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.quizHistory.map(q => {
+                    const pct = Math.round((q.score / q.total_questions) * 100);
+                    const color = pct >= 70 ? '#10b981' : (pct >= 50 ? '#f59e0b' : '#ef4444');
+                    return `
+                        <tr>
+                            <td><strong>${q.course_slug}</strong></td>
+                            <td>${q.score} / ${q.total_questions}</td>
+                            <td><strong style="color: ${color};">${pct}%</strong></td>
+                            <td><small>${new Date(q.attempted_at).toLocaleString()}</small></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        })
+        .catch(err => console.error(err));
+};
+
+window.closeStudentModal = function() {
+    document.getElementById('studentModal').style.display = 'none';
+};
+
+/**
+ * Load and display tickets
+ */
+window.loadTickets = function() {
+    fetch('/api/admin/tickets')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const statusFilter = document.getElementById('ticketStatusFilter').value;
+                let tickets = data.tickets;
+
+                if (statusFilter !== 'all') {
+                    tickets = tickets.filter(t => t.status === statusFilter);
+                }
+
+                const tbody = document.getElementById('tickets-table-body');
+                if (tickets.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 2rem; color:var(--text-gray);">Ingen saker matcher valgt filter.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = tickets.map(t => {
+                    const statusClass = t.status === 'resolved' ? 'badge-resolved' : (t.status === 'in_progress' ? 'badge-warning' : 'badge-new');
+                    const priorityClass = t.priority === 'critical' ? 'badge-danger' : (t.priority === 'high' ? 'badge-warning' : 'badge-info');
+
+                    return `
+                        <tr>
+                            <td>#${t.id}</td>
+                            <td>
+                                <strong>${t.title}</strong>
+                                <div style="font-size:0.8rem; color:var(--text-gray); max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    ${t.description || ''}
+                                </div>
+                            </td>
+                            <td>${t.user_name || t.username || 'Anonym'}<br><small style="color:var(--text-gray);">${t.user_contact || t.email || ''}</small></td>
+                            <td><span class="badge badge-info">${t.category}</span></td>
+                            <td><span class="badge ${priorityClass}">${t.priority}</span></td>
+                            <td><span class="badge ${statusClass}">${t.status}</span></td>
+                            <td><small>${new Date(t.created_at).toLocaleDateString()}</small></td>
+                            <td>
+                                ${t.status !== 'resolved' ? `
+                                    <button class="btn btn-outline btn-sm" onclick="markTicketResolved(${t.id})">Løs sak</button>
+                                ` : `
+                                    <span style="color:#059669; font-weight:600; font-size:0.8rem;">✓ Løst</span>
+                                `}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        })
+        .catch(err => console.error('Feil ved henting av tickets:', err));
+};
+
+window.markTicketResolved = function(ticketId) {
+    fetch(`/api/admin/tickets/${ticketId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'resolved' })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            loadTickets();
+        } else {
+            alert('Feil: ' + data.message);
+        }
+    });
+};

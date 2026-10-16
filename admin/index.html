@@ -26,6 +26,14 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Oversikt
           </a></li>
+          <li><a href="#" data-view="teacher">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            Lærer-oversikt
+          </a></li>
+          <li><a href="#" data-view="tickets">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Brukerstøtte (Tickets)
+          </a></li>
           <li><a href="#" data-view="users">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             Medlemmer
@@ -91,6 +99,129 @@
               <h3>Brukervekst</h3>
               <canvas id="usersChart"></canvas>
             </div>
+          </div>
+        </div>
+
+        <!-- Teacher Overview View -->
+        <div id="teacher-view" class="view" style="display: none;">
+          <!-- MCP Simulator Control Panel -->
+          <div class="sim-control-panel">
+            <div class="sim-info">
+              <h3>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                MCP Elev- & Oppgavesimulator
+              </h3>
+              <p>Generer testelever og simuler tilfeldige eller realistiske oppgavebesvarelser for å teste lærer-oversikten.</p>
+            </div>
+            <div class="sim-actions">
+              <span id="simStatusPill" class="sim-status-pill">⏳ Laster simulator...</span>
+              <button class="btn-sim-run" id="btnRunSimulation" onclick="runSimulation()">
+                🎲 Generer 8 testelever & svar
+              </button>
+              <button class="btn-sim-clear" id="btnClearSimulation" onclick="clearSimulation()">
+                🧹 Nullstill testdata
+              </button>
+            </div>
+          </div>
+
+          <!-- Key Metrics -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Registrerte Elever</span>
+              <span class="stat-value" id="teacher-stat-students">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Klassens Snittscore</span>
+              <span class="stat-value" id="teacher-stat-avg-score">0%</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Fullførte Kurs</span>
+              <span class="stat-value" id="teacher-stat-completed">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Trenger Oppfølging (&lt;50%)</span>
+              <span class="stat-value" id="teacher-stat-at-risk" style="color: #ef4444;">0</span>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
+            <div class="content-card">
+              <h3>Snittscore per kurs</h3>
+              <canvas id="teacherCourseChart"></canvas>
+            </div>
+            <div class="content-card">
+              <h3>Karakterfordeling i klassen</h3>
+              <canvas id="teacherDistributionChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Students Table -->
+          <div class="content-card">
+            <div class="table-controls">
+              <h3>Elevprogresjon og Oppgaveresultater</h3>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" id="teacherSearchInput" class="form-input" placeholder="Søk etter elev..." oninput="filterTeacherStudents()">
+                <select id="teacherFilterSelect" class="form-input" onchange="filterTeacherStudents()">
+                  <option value="all">Alle elever</option>
+                  <option value="passed">Bestått (&gt;= 70%)</option>
+                  <option value="risk">Trenger oppfølging (&lt; 50%)</option>
+                </select>
+              </div>
+            </div>
+
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Elev</th>
+                  <th>E-post</th>
+                  <th>Fullførte Kurs</th>
+                  <th>Quizer Tatt</th>
+                  <th>Gj.snitt Score</th>
+                  <th>Status</th>
+                  <th>Siste Aktivitet</th>
+                  <th>Handling</th>
+                </tr>
+              </thead>
+              <tbody id="teacher-students-table-body">
+                <tr><td colspan="8" style="text-align: center; color: var(--text-gray);">Laster elevdata...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tickets / Brukerstøtte View -->
+        <div id="tickets-view" class="view" style="display: none;">
+          <div class="content-card">
+            <div class="table-controls">
+              <h3>Aktive Brukerstøttesaker (Tickets)</h3>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <select id="ticketStatusFilter" class="form-input" onchange="loadTickets()">
+                  <option value="all">Alle statuser</option>
+                  <option value="open">Kun åpne</option>
+                  <option value="in_progress">Under arbeid</option>
+                  <option value="resolved">Løste</option>
+                </select>
+              </div>
+            </div>
+
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tittel</th>
+                  <th>Bruker / Elev</th>
+                  <th>Kategori</th>
+                  <th>Prioritet</th>
+                  <th>Status</th>
+                  <th>Opprettet</th>
+                  <th>Handling</th>
+                </tr>
+              </thead>
+              <tbody id="tickets-table-body">
+                <tr><td colspan="8" style="text-align: center; color: var(--text-gray);">Laster saker...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -235,6 +366,49 @@
           <button type="submit" class="btn btn-primary">Lagre</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Student Detail Modal -->
+  <div id="studentModal" class="detail-modal">
+    <div class="detail-modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <h2 id="modalStudentName" style="margin: 0;">Elevnavn</h2>
+          <span id="modalStudentEmail" style="color: var(--text-gray); font-size: 0.9rem;"></span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeStudentModal()">✕ Lukk</button>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom: 1.5rem; grid-template-columns: repeat(3, 1fr);">
+        <div class="stat-card" style="padding: 1rem;">
+          <span class="stat-label">Fullførte kurs</span>
+          <span class="stat-value" id="modalStudentCourses" style="font-size: 1.5rem;">0</span>
+        </div>
+        <div class="stat-card" style="padding: 1rem;">
+          <span class="stat-label">Quiz-forsøk</span>
+          <span class="stat-value" id="modalStudentAttempts" style="font-size: 1.5rem;">0</span>
+        </div>
+        <div class="stat-card" style="padding: 1rem;">
+          <span class="stat-label">Gj.snittlig score</span>
+          <span class="stat-value" id="modalStudentAvg" style="font-size: 1.5rem;">0%</span>
+        </div>
+      </div>
+
+      <h3>Quiz-historikk og oppgaveforsøk</h3>
+      <table class="admin-table" style="margin-top: 1rem;">
+        <thead>
+          <tr>
+            <th>Kurs / Oppgave</th>
+            <th>Poeng</th>
+            <th>Score %</th>
+            <th>Tidspunkt</th>
+          </tr>
+        </thead>
+        <tbody id="modalQuizHistoryBody">
+          <tr><td colspan="4" style="text-align:center;">Laster besvarelser...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
