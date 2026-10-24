@@ -1,0 +1,29 @@
+# Render Blueprint: kobler GitHub-repoet til en gratis webtjeneste.
+# Verdier med sync: false fylles inn i Render-dashboardet, aldri her.
+services:
+  - type: web
+    name: it-portalen
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

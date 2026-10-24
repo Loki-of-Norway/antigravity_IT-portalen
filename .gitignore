@@ -1,3 +1,6 @@
 .env
 node_modules
 .DS_Store
+
+# ---- Lokale AI-agent-kit (ikke en del av prosjektet) ----
+.temp_ag_kit/

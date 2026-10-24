@@ -1,52 +1,74 @@
 # IT-portalen 🚀
 
-En moderne, responsiv og funksjonell brukerstøtteportal utviklet for elever og personer med behov for IT-støtte. Portalen kombinerer et profesjonelt design med en solid teknisk backend.
+**IT-portalen er en norsk læringsportal der VG1/VG2-elever, IT-lærlinger og nysgjerrige lærer IT og koding i nettleseren, med en AI-tutor som gir hint i stedet for fasit.**
 
-## 🌟 Funksjoner
+🔗 **Live:** _kommer_ · 👤 **Demo-bruker:** _kommer_
 
-- **20+ Temasider:** Omfattende guider innen IT-drift, sikkerhet, etikk og kommunikasjon.
-- **Interaktiv Chatbot:** Loki Chatbot hjelper brukere med raske svar på vanlige spørsmål.
-- **Dynamisk Søk:** Finn raskt frem til riktig ressurs med sanntidsfiltrering på forsiden.
-- **Brukerhåndtering:** Full støtte for registrering og innlogging med sikker database-lagring.
-- **Kontaktskjema & Tilbakemelding:** Integrasjon med MySQL for lagring av henvendelser og brukervurderinger.
-- **Responsivt Design:** Optimalisert for både mobil, nettbrett og desktop.
+![Forsiden](docs/screenshots/forside.png)
 
-## 🛠 Teknologi
+## Hva kan du gjøre i portalen?
 
-- **Frontend:** HTML5, Vanilla CSS3 (Custom Design System), JavaScript (ES6+).
-- **Backend:** Node.js (Express) with MySQL (mysql2) for secure database communication.
-- **Database:** MySQL (innstalleres via `database.sql`).
-- **Ikoner:** Feather Icons (SVG).
-- **Typografi:** Inter (Google Fonts).
+- **Lære å kode i nettleseren:** En innebygd IDE med HTML/CSS/JS-editor, live forhåndsvisning, terminal og ti oppgaver i stigende vanskelighetsgrad.
+- **Få hjelp av Loki-tutoren:** AI-tutoren (Google Gemini) ser koden og feilmeldingene dine og svarer med hint og forklaringer, ikke ferdig kode.
+- **Lese guider:** Over 20 artikler om IT-drift, sikkerhet, personvern (GDPR/EKOM), etikk og kommunikasjon, med søk på forsiden.
+- **Følge med på egen fremgang:** Kursfremgang og quiz-resultater lagres per bruker.
+- **Be om brukerstøtte:** Et ticket-system og en chatbot for vanlige IT-spørsmål.
+- **Følge med som lærer eller admin:** Et dashboard med elevoversikt, fremgang per elev, tickets, tilbakemeldinger og statistikk.
 
-## 🚀 Kom i gang
+| Koding-IDE med Loki-tutor | Kodekurs |
+| --- | --- |
+| ![Koding-IDE](docs/screenshots/koding-ide.png) | ![Introduksjon til koding](docs/screenshots/introduksjon-til-koding.png) |
 
-### Forutsetninger
-- [Node.js](https://nodejs.org/) (anbefalt LTS versjon).
-- MySQL/MariaDB (f.eks. via XAMPP eller en separat installasjon).
+## Teknologi
 
-### Installasjon
-1. Last ned eller klon prosjektet.
-2. Åpne terminalen i prosjektmappen og kjør:
-   ```bash
-   npm install
-   ```
-3. Importer `database.sql` i din MySQL-database (inneholder alle tabeller for tickets, kurs og chat).
-4. Opprett en `.env`-fil i rotmappen med følgende innhold:
-   ```env
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASS=ditt_passord
-   DB_NAME=IT_portalen
-   SESSION_SECRET=velg_en_hemmelig_streng
-   PORT=3000
-   ```
-5. Start serveren:
-   ```bash
-   node server.js
-   ```
-6. Åpne `http://localhost:3000` i nettleseren din.
+| Del | Valg |
+| --- | --- |
+| Frontend | HTML5, CSS3 (eget designsystem), vanilla JavaScript (ES6+) |
+| Backend | Node.js med Express 5, express-session, bcrypt |
+| Database | MySQL (mysql2), lokalt eller på Aiven |
+| AI | Google Gemini via `@google/genai` |
+| Agent-verktøy | MCP-server (`mcp/`) som simulerer elever og tickets for testing av lærer-dashboardet |
 
-## 👤 Forfatter
-**Theodor "Loki" Kvalem**
-© 2026 IT-portalen. Designet for Students and People who need IT-support.
+## Kom i gang lokalt
+
+**Du trenger:** [Node.js](https://nodejs.org/) (LTS) og MySQL/MariaDB (for eksempel via XAMPP).
+
+```bash
+git clone https://github.com/Loki-of-Norway/antigravity_IT-portalen.git
+cd antigravity_IT-portalen
+npm install
+cp .env.example .env              # fyll inn egne verdier
+node scripts/run_sql.js database.sql
+node scripts/seed_admin.js        # oppretter admin fra ADMIN_* i .env
+npm start
+```
+
+Åpne deretter `http://localhost:3000`.
+
+## Deploy (Render)
+
+Repoet har en `render.yaml`. Gjør slik:
+
+1. Opprett en ny **Blueprint** på [Render](https://render.com) og koble den til dette repoet.
+2. Fyll inn `DB_*` (for eksempel fra Aiven) og `GEMINI_API_KEY` i dashboardet. `SESSION_SECRET` genereres automatisk.
+3. Kjør `scripts/run_sql.js` og `scripts/seed_admin.js` én gang mot databasen fra din egen maskin, med de samme verdiene i `.env`.
+
+## Struktur
+
+```
+├─ server.js        Express-server og alle API-ruter
+├─ database.sql     Tabeller for brukere, kurs, tickets, chat m.m.
+├─ index.html       Forside
+├─ pages/           Artikler, kategorier, tjenester og IDE
+├─ admin/           Admin- og lærer-dashboard
+├─ css/ js/         Designsystem og frontend-logikk
+├─ mcp/             MCP-server for elevsimulering
+├─ scripts/         Hjelpeskript for database og admin-bruker
+└─ docs/            Prosjektbeskrivelse, oversikt og videre planer
+```
+
+Mer om bakgrunn, valg og refleksjoner står i [docs/PROSJEKTBESKRIVELSE.md](docs/PROSJEKTBESKRIVELSE.md). Planer for videre utvikling står i [docs/FremtidigeOppgraderinger.md](docs/FremtidigeOppgraderinger.md).
+
+## Forfatter
+
+**Theodor "Loki" Kvalem**: tidligere sveiser, nå IT-utvikler under utdanning, på jakt etter læreplass.

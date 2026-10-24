@@ -66,16 +66,28 @@ async function chatMedKodelærer(brukerMelding, chatHistorikk = [], ekstraKontek
 
 const app = express();
 const port = process.env.PORT || 3000;
+const isProduction = process.env.NODE_ENV === 'production';
+
+// I produksjon skal sesjonsnøkkelen alltid komme fra miljøvariabler
+if (isProduction && !process.env.SESSION_SECRET) {
+    console.error('SESSION_SECRET mangler. Sett den i miljøvariablene før oppstart.');
+    process.exit(1);
+}
+
+// Render (og de fleste hostere) ligger bak en proxy som håndterer HTTPS
+if (isProduction) {
+    app.set('trust proxy', 1);
+}
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'loki-brukerstotte-secret',
+    secret: process.env.SESSION_SECRET || 'kun-for-lokal-utvikling',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
+    cookie: { secure: isProduction } // Sikre cookies over HTTPS i produksjon
 }));
 
 // Database Connection
